@@ -1,0 +1,13 @@
+name: TMC Zombie SMP
+main: com.themaskedcrusader.tmcz.Tmcz
+version: Alpha 2.1.147.2
+
+commands:
+    tmcz:
+        description: Access to all TMCZ admin commands
+    spawnz:
+        description: Spawn into the TMCZ game
+    diez:
+        description: Commit suicide, return to world spawn
+    killz:
+        description: See your current Zombie/Player kills

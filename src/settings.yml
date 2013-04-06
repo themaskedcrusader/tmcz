@@ -1,0 +1,194 @@
+# Settings Configuration File for TMC Zombie Survival (TMCZ) plugin
+#
+# IMPORTANT!!!  -- THE TMCz ITEM FORMAT --
+#
+#      <ItemId>|<Quantity>|<Data Value>|<Damage Value>
+#
+#  Item ID  = The Internal ID of the item. REQUIRED (Consult Minecraft wiki for Item IDs)
+#  Quantity = The Quantity of the Item. REQUIRED (Always required, but ignored where noted below)
+#  Data     = The Data Value associated with the item. Optional/Required (Consult the Wiki for Appropriate Data values)
+#             NOTE: For potions, this value MUST be -1.
+#  Damage   = The Damage Value of tha item. Optional. If damage value is specified, then data value MUST also be
+#             specified. If you need the damage value, but not the data value, set the data value to  -1.
+#             Consult the wiki for appropriate damage values for items, Specifically potions.
+#             Potions damage values table: http://www.minecraftwiki.net/wiki/Potions#Data_value_table
+#
+# EXAMPLE:   373|10|-1|16421  = 10 Splash potions of Instant Healing II
+# EXAMPLE:   351|1|10         = 1 piece of lime dye
+# EXAMPLE:   276|2            = 2 diamond swords
+
+debug: true  # If true: some hidden debug features are available for developers.
+
+world:
+  name: world                # Internal world name of authorized world. Must be specified for certain features to work
+  single: true               # If false: dependant modules are active on all server worlds
+  op-is-god: true            # If true: any OP player will not take damage
+  record-zombie-death: true  # If true: Plugin will track all zombie kills across specified world.
+
+########################################################################################################################
+#####   INCLUDED MODULES - Enable each individually for customized servers                                         #####
+########################################################################################################################
+
+
+# TODO: There is an exception in saveToDisk. NoClassDefFound: PlayerUtil
+autosave-system:      # This module runs for all players on the server. Single World Configuration is ignored.
+  enabled: false      # If true: all players data is backed up to disk on a set interval
+  minutes: 5          # Approximate number of minutes between save intervals, laggy server will have longer intervals
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+bleed-system:
+  enabled: false         # If true: player bleeding system is activated
+  only-in-game: false    # If true: Bleed system only works for players who are playing TMCz
+  server-wide: false     # If true: Bleed System affects all worlds on server, only-in-game property ignored.
+  seconds: 3             # Number of seconds of Blindness player gets per damage hit
+  chance: 5              # Percent chance that a valid hit will cause bleeding
+  damage: 1              # How many health levels are taken each bleed hit
+  ticks: 200             # Number of ticks between damage hits when bleeding
+  healer-item: 351|1|1   # Item that healer uses to stop the bleeding in TMCz item format. (qty ignored)
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+game-system:               ## The core TMCz Game Mechanics
+  enabled: false           # If true, the TMCz game play is enabled on the specified world
+  return-to-spawn: true    # If true: players on game world who don't have a save file are sent back to world spawn.
+  pvp: true                # If true: players in game on game world can damage each other
+  only-zombies: true       # If true: Only zombie type mobs will spawn in the game world
+  bandit-tag: true         # If true: players who kill other players above limit set are flagged as a bandit
+  bandit_kills: 5          # The number of other player kills a player needs to be flagged as a bandit
+  bandit-lose-tag: true    # If true: a bandit can lost their bandit tag if they heal other players
+  bandit-healer: 15        # The number of other player heals a bandit must make to lose their bandit tag
+  healer-tag: true         # If true: a player who heals other players can be flagged as a healer
+  healer-heals: 10         # The number of other player heals a player must make to earn the healer tag
+  start-kit:
+    enabled: true          # If true: player's inventory is cleared and they are given these items when game is started
+    helmet:   298|1|-1|41  # The following lines are to equip armor when the player starts the game.
+    armor:    299|1|-1|64  # If you don't want the armor to be equipped, delete the row from the file
+    leggings: 300|1|-1|58  # If you want damaged armor to be equipped, be sure to add a damage value
+    boots:    301|1|-1|57  # The code will only equip armor that is specified here
+    items:                 # Items player is given when spawned into the game. each item is in TMCz Item Format
+      - 268|1
+      - 373|1|-1|0
+      - 299|1
+  spawn:
+    teleport: true        # If true: the player is teleported to a new location when they start the game
+    random: true          # If true: will choose a random location within area bound by zone1 and zone2
+    zone1: -100|-100      # One corner of the bounding box for random spawns in <x>|<z> format
+    zone2: 100|100        # Other corner of the bounding box for random spawns in <x>|<z> format
+    static-locations:     # List of static spawning locations. Can be set in game with command /tmcz addspawn
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+health-system:
+  enabled: false       # If true: Health System is active
+  only-in-game: false  # If true: Health system only works for players who are playing TMCz
+  server-wide: false   # If true: Health System affects all worlds on server, only-in-game property ignored.
+  start: 10            # Health level player is set to when they respawn, 1 heart = 2 points
+  maximum: 10          # Maximum health level the player can have. Setting lower than 20 makes the game harder
+  regen: false         # If true: Player's health regenerates normally when satiated
+  food-gives: true     # If true: Eating food will restore health
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+infection-system:
+  enabled: false         # If true, Infection system is activated
+  only-in-game: false    # If true: Infection system only works for players who are playing TMCz
+  server-wide: false     # If true: Infection System affects all worlds on server, only-in-game property ignored.
+  duration: 15           # Seconds of Confusion effect per damage hit
+  chance: 5              # Percent chance that zombie hit will cause infection
+  damage: 5              # Number of health points are taken each damage hit
+  ticks: 600             # Number of ticks between damage hits
+  check-ticks: 35        # Number of ticks after start drinking milk to check if finished.
+  hurl: true             # If true: Player's food bar will deplete each damage hit
+  healer-item: 351|1|10  # Item that healer uses to cure infection in TMCz item format. (qty ignored)
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# PLEASE NOTE: If this system is enabled, all block breaking and placing will be prohibited on the world configured
+# at the top of this configuration file, as if WorldGuard were enabled. Only players with the tmcz.builder permission
+# and Server Operators will have the ability to build and break freely. All other block interactions will be
+# according to the following configurations
+item-system:
+  enabled: false          # If true: the following custom item interactions are enabled
+  end-grenade:
+    enabled: true         # If true: ender pearls will function as grenades
+    only-in-game: true    # If true: end-grenades only work for players playing TMCz
+    server-wide: false    # If true: end-grenades work on all server worlds, only-in-game property ignored.
+    protect-world: true   # If true: all explosions won't destroy world blocks
+    radius: 3             # the radius of the explosion of ender grenade. Don't set too high
+  melon:
+    enabled: true         # If true: players can harvest melons for melon slices/food
+    only-in-game: true    # If true: players can only harvest melons while playing TMCz
+    server-wide: false    # If true: any player on the server can harvest melons, only-in-game property ignored.
+    tool-id: 290          # Item ID of tool that can break melons
+  mushroom:
+    enabled: true         # If true: players can harvest mushrooms for food
+    only-in-game: true    # If true: players can only harvest mushrooms while playing TMCz
+    server-wide: false    # If true: any player on the server can harvest mushrooms, only-in-game property ignored.
+    tool-id: 256          # Item ID of tool that can harvest mushrooms
+    respawn: true         # if True, broken mushrooms respawn after a specified number of seconds
+    respawn-seconds: 300  # number of seconds before a mushroom will respawn in its original location
+  cobweb:
+    enabled: true         # If true: players can break map cobwebs
+    only-in-game: true    # If true: players can only break cobwebs while playing TMCz
+    server-wide: false    # If true: any player on the server can break cobwebs this way, only-in-game property ignored.
+    tool-id: 290          # Item ID of tool that can break cobwebs
+    drop: true            # If true: broken cobwebs drop a place-able cobweb item
+    respawn: true         # If true: broken cobwebs will re-spawn in their original location
+    respawn-seconds: 300  # number of seconds before a cobweb will re-spawn after it is broken
+  block-protection:
+    place: true           # If true: players can place specified blocks, all other block placing is prohibited
+    break: true           # If true: players can break specified blocks, all other block breaking is prohibited
+    op-can-build: true    # If true: OPs are exempt from block/item protection and items placed are not tracked
+    only-in-game: false   # If true: block protection is only enforced against players who are playing TMCz
+    server-wide: false    # If true: block place protection is enforced server-wide. Ignores previous setting
+    allowed-items:        # list of items allowed to be placed in <ItemId>|<Despawn Seconds>|<Respawn Seconds> format
+    - 50|300|-1
+    - 103|60|-1
+    - 77|60|60
+    - 69|60|60
+    - 30|500|-1
+
+    # NOTES:  1. To allow certain placed blocks to not despawn, set the despawn seconds value to -1
+    #         2. To allow certain broken blocks to not respawn, set the respawn seconds value to -1
+    #         3. To allow placing of certain block types, but not breaking, set the respawn seconds to 0
+    #         4. To allow breaking of certain block types, but not placing, set the despawn seconds to 0
+    #         5. Player placed blocks will not respawn, regardless of respawn setting
+#-----------------------------------------------------------------------------------------------------------------------
+
+# TODO: VERIFY WORKING
+limit-stacks:
+  enabled: false       # If true: Items picked up by player will be stacked to the limits specified in stack-sizes.yml
+  only-in-game: false  # If true: players' stack will only be limited while playing TMCz
+  server-wide: true    # If true: all player stacks will be limited on the server, only-in-game property ignored.
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+thirst-system:
+  enabled: false       # If true: Player thirst system will be activated
+  only-in-game: true   # If true: Thirst system only works for players who are playing TMCz
+  server-wide: false   # If true: Thirst System affects all worlds on server, only-in-game property ignored.
+  thirst-ticks: 420    # Number of ticks between losing one thirst level
+  damage-ticks: 60     # When thirst is at 0, number of ticks between damage hits
+  damage-hit: 1        # Amount of health each damage hit takes
+  full: 20             # How many levels equals a fully quenched player
+  refill: 20           # How many levels drinking water will restore
+  check-ticks: 35      # How many ticks after player begins drinking will the plugin check to see if player finished.
+  start: 10            # Player's thirst level when they spawn into the game
+  parch-1: 10          # What level will message thirst.parch-1 display to player
+  parch-2: 7           # What level will message thirst.parch-2 display to player
+  parch-3: 3           # What level will message thirst.parch-3 display to player
+  parch-4: 1           # What level will message thirst.parch-4 display to player
+  death-lvl: 1         # What level will message thirst.death   display to player
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+#### VISIBILITY SYSTEM CURRENTLY INCOMPLETE, ENABLE AT YOUR OWN RISK
+# NOTE: VISIBILITY SYSTEM ONLY WORKS IF SINGLE-WORLD IS ENABLED AT THE TOP OF THIS FILE.
+visibility-system:
+  enabled: false       # If true: Visibility system will be activated (currently display only)
+  only-in-game: true   # If true: Visibility system only works for players who are playing TMCz
+  server-wide: false   # If true: Visibility System affects all worlds on server, only-in-game property ignored.
+  ticks: 10            # Number of ticks between updating your visibility bar
+
+#------------------------------------------------- eof

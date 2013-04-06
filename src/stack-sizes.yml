@@ -1,0 +1,45 @@
+# Format: <itemId>|<max stack size>
+# Example: to limit paper to a stack side of 1, you'd enter:
+#    - 339|1
+#
+# Currently, if enabled, these stack size limits are SERVER WIDE! so even your worlds that do not have TMCz
+# running will be affected. In a future release, I'll make this specific only to the TMCz world.
+
+stack-limits:
+  - 30|3      # COBWEBS
+  - 39|2      # BROWN MUSHROOM
+  - 40|2      # RED MUSHROOM
+  - 50|5      # TORCH
+  - 69|1      # LEVER
+  - 77|1      # STONE BUTTON
+  - 103|2     # MELON
+  - 260|1     # APPLE
+  - 262|15    # ARROW
+  - 280|2     # EMPTY BOWL
+  - 296|6     # WHEAT
+  - 297|3     # BREAD
+  - 319|1     # PORK CHOP (Raw)
+  - 320|1     # PORK CHOP (Cooked)
+  - 322|1     # GOLDEN APPLE
+  - 325|2     # BUCKET
+  - 332|5     # SNOWBALL (Tin Can)
+  - 339|1     # PAPER
+  - 351|1     # DYES (Antibiotic/Ointment)
+  - 357|8     # COOKIES
+  - 360|5     # MELON SLICES
+  - 363|1     # BEEF (Raw)
+  - 364|1     # BEEF (Cooked)
+  - 365|1     # CHICKEN (Raw)
+  - 366|1     # CHICKEN (Cooked)
+  - 367|1     # ZOMBIE FLESH
+  - 368|1     # ENDER PEARL (GRENADE)
+  - 374|1     # EMPTY BOTTLE
+  - 375|3     # SPIDER EYE
+  - 391|3     # CARROT
+  - 392|3     # POTATO
+  - 393|3     # BAKED POTATO
+  - 394|3     # POISONOUS POTATO
+  - 400|1     # PUMPKIN PIE
+
+
+

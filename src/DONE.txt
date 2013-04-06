@@ -1,0 +1,15 @@
+Completed Systems:
+
+DONE:
+** Bleed System
+** Thirst System
+** Visibility Bar (All mobs, not just zombies/fasterZombies)
+** Infection System
+** ZOMBIE system
+** Item/Block interaction
+** Stack Limits
+
+TODO:
+Health
+AutoSave
+Game.Player
