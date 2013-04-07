@@ -1,6 +1,9 @@
-name: TMC Zombie SMP
+name: TMCz
 main: com.themaskedcrusader.tmcz.Tmcz
 version: Alpha 2.1.147.2
+description: A Zombie Survival gamemode similar to MineZ/DayZ for bukkit Servers
+author: masked_crusader
+website: http://dev.bukkit.org/server-mods/tmc-zombie-smp/
 
 commands:
     tmcz:
