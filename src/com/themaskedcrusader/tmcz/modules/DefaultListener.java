@@ -23,6 +23,7 @@ import com.themaskedcrusader.tmcz.data.PlayerUtil;
 import com.themaskedcrusader.tmcz.modules.game.Game;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -48,13 +49,24 @@ public class DefaultListener implements Listener {
                 entity.getLastDamageCause() instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) entity.getLastDamageCause();
             if (damage.getDamager().getType() == EntityType.PLAYER) {
-                Player killer = (Player) damage.getDamager();
-                PlayerUtil.addZombieKill(killer);
-                killer.sendMessage(ChatColor.YELLOW +
-                        Messages.getConfig().getString(Game.ZOMBIE_KILLS) + " " +
-                        PlayerUtil.getZombieKills(killer));
+                Player player = (Player) damage.getDamager();
+                addKill(player);
+
+            } else if (damage.getDamager().getType() == EntityType.ARROW) {
+                Arrow arrow = (Arrow) damage.getEntity();
+                Entity player = arrow.getShooter();
+                if (player instanceof Player) {
+                    addKill((Player) player);
+                }
             }
         }
+    }
+
+    private void addKill(Player player) {
+        PlayerUtil.addZombieKill(player);
+        player.sendMessage(ChatColor.YELLOW +
+                Messages.getConfig().getString(Game.ZOMBIE_KILLS) + " " +
+                PlayerUtil.getZombieKills(player));
     }
 
     @EventHandler

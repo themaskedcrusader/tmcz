@@ -34,7 +34,6 @@ public class Health {
     public static final String REGEN        = SYSTEM + ".regen";
     public static final String FOOD         = SYSTEM + ".food-gives";
 
-    // Suppress instantiability of Utility Class
     private Health() {}
 
     public static void initialize(JavaPlugin plugin) {
