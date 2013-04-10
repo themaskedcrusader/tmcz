@@ -75,7 +75,7 @@ game-system:               ## The core TMCz Game Mechanics
     random: true          # If true: will choose a random location within area bound by zone1 and zone2
     zone1: -100|-100      # One corner of the bounding box for random spawns in <x>|<z> format
     zone2: 100|100        # Other corner of the bounding box for random spawns in <x>|<z> format
-    static-locations:     # List of static spawning locations. Can be set in game with command /tmcz addspawn
+    static-locations:     # List of static mobs locations. Can be set in game with command /tmcz addspawn
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -190,5 +190,20 @@ visibility-system:
   only-in-game: true   # If true: Visibility system only works for players who are playing TMCz
   server-wide: false   # If true: Visibility System affects all worlds on server, only-in-game property ignored.
   ticks: 10            # Number of ticks between updating your visibility bar
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# Current iteration - Custom mobs only on world specified at the top of this file.
+mob-controls:            # This system only modifies the mobs rate for the mob type. Does not change mob behavior
+  cycle-offset: 10       # Number of ticks between cycles, set higher on busier servers; about 20 ticks = 1 second;
+  zombies:
+    spawn-enabled: true  # Use the custom spawning algorithm for zombies
+    world-max: 100       # If the number of zombies in the world is greater than this number, spawning will be cancelled
+    tries-per-cycle: 8   # No. of zombies that the system will try to spawn each cycle, fewer will be actually spawned
+    can-burn: false      # If true: Zombies will burn in the daylight.
+  giants:
+    enabled: false       # NOT ENABLED YET
+    world-max: 0         # NOT ENABLED YET
+    tries-per-cycle: 0   # NOT ENABLED YET
 
 #------------------------------------------------- eof
