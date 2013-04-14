@@ -53,7 +53,6 @@ game-system:               ## The core TMCz Game Mechanics
   enabled: false           # If true, the TMCz game play is enabled on the specified world
   return-to-spawn: true    # If true: players on game world who don't have a save file are sent back to world spawn.
   pvp: true                # If true: players in game on game world can damage each other
-  only-zombies: true       # If true: Only zombie type mobs will spawn in the game world
   bandit-tag: true         # If true: players who kill other players above limit set are flagged as a bandit
   bandit_kills: 5          # The number of other player kills a player needs to be flagged as a bandit
   bandit-lose-tag: true    # If true: a bandit can lost their bandit tag if they heal other players
@@ -108,6 +107,7 @@ infection-system:
 # at the top of this configuration file, as if WorldGuard were enabled. Only players with the tmcz.builder permission
 # and Server Operators will have the ability to build and break freely. All other block interactions will be
 # according to the following configurations
+
 item-system:
   enabled: false          # If true: the following custom item interactions are enabled
   end-grenade:
@@ -156,11 +156,13 @@ item-system:
     #         5. Player placed blocks will not respawn, regardless of respawn setting
 #-----------------------------------------------------------------------------------------------------------------------
 
-# TODO: VERIFY WORKING
+# Stack limits are applied SERVER WIDE! If you run a server with multi-verse and the TMCz world is only one of many
+# worlds on your server, stack limits will apply to your non-TMCz worlds as well. If you want to enabled stack limits
+# only in the TMCz game, you'll have to setup a dedicated server for tmcz and setup cross-server portals to transport
+# your players back and forth. (This is how the lobby of the ShotBow Network works.)
+
 limit-stacks:
-  enabled: false       # If true: Items picked up by player will be stacked to the limits specified in stack-sizes.yml
-  only-in-game: false  # If true: players' stack will only be limited while playing TMCz
-  server-wide: true    # If true: all player stacks will be limited on the server, only-in-game property ignored.
+  enabled: false
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -185,6 +187,7 @@ thirst-system:
 
 #### VISIBILITY SYSTEM CURRENTLY INCOMPLETE, ENABLE AT YOUR OWN RISK
 # NOTE: VISIBILITY SYSTEM ONLY WORKS IF SINGLE-WORLD IS ENABLED AT THE TOP OF THIS FILE.
+
 visibility-system:
   enabled: false       # If true: Visibility system will be activated (currently display only)
   only-in-game: true   # If true: Visibility system only works for players who are playing TMCz
@@ -193,17 +196,12 @@ visibility-system:
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-# Current iteration - Custom mobs only on world specified at the top of this file.
-mob-controls:            # This system only modifies the mobs rate for the mob type. Does not change mob behavior
-  cycle-offset: 10       # Number of ticks between cycles, set higher on busier servers; about 20 ticks = 1 second;
-  zombies:
-    spawn-enabled: true  # Use the custom spawning algorithm for zombies
-    world-max: 100       # If the number of zombies in the world is greater than this number, spawning will be cancelled
-    tries-per-cycle: 8   # No. of zombies that the system will try to spawn each cycle, fewer will be actually spawned
-    can-burn: false      # If true: Zombies will burn in the daylight.
-  giants:
-    enabled: false       # NOT ENABLED YET
-    world-max: 0         # NOT ENABLED YET
-    tries-per-cycle: 0   # NOT ENABLED YET
+# The mob-controls section modifies certain characteristics of existing vanilla mobs.
+# Mob controls currently only work on world specified at the top of this file.
 
-#------------------------------------------------- eof
+mob-controls:
+  zombies:
+    can-burn: false        # If true: Zombies will burn in the daylight.true
+
+
+#-------------------------------------------------------------------------------- eof

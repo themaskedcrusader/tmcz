@@ -1,0 +1,57 @@
+# This file controls which mob types can spawn in the TMCz world (specified at the top of the settings.yml file.)
+# If any mob type is set to false, then they will not be allowed to spawn in the TMCz world, and any existing of
+# that type in the world when the plugin loads will be removed.
+
+spawn-control:
+#  hostile-mobs
+  blaze: false
+  cave_spider: false
+  creeper: false
+  ghast: false
+  giant: false
+  magma_cube: false
+  monster: false
+  silverfish: false
+  skeleton: false
+  slime: flase
+  spider: false
+  witch: false
+  wither-skeleton: false
+  zombie: true
+
+#  neutral-mobs
+  enderman: false
+  wolf: false
+  pig_zombie: false
+
+#  passive-mobs
+  bat: true
+  chicken: false
+  cow: false
+  horse: false
+  iron_golem: false
+  mushroom_cow: false
+  ocelot: false
+  pig: false
+  sheep: false
+  snowman: true
+  squid: false
+  villager: false
+
+#  bosses
+  ender-dragon: false
+  wither: false
+
+
+#-----------------------------------------------------------------------------------------------------------------------
+
+# If a mob-type listed above has custom spawning features, those are set here. These settings will only apply if the
+# setting above is set to true.
+
+custom-spawn-control:
+  cycle-offset: 10         # Number of ticks between spawning cycles. set higher on busier servers (1 sec ~ 20 ticks)
+  zombie:
+    vanilla-spawns: false  # If true: allow the standard spawning system to spawn zombies too. (More zombies at night)
+    enabled: true          # Use the custom spawning algorithm for zombies. Allows spawn during the daylight
+    world-max: 100         # The maximum number of this mob type in the game world.
+    tries-per-cycle: 8     # No. of mobs that the custom spawner will try to spawn each cycle. Some will fail.\

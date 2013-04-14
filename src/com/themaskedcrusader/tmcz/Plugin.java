@@ -30,6 +30,7 @@ import com.themaskedcrusader.tmcz.modules.infection.Infection;
 import com.themaskedcrusader.tmcz.modules.items.BlockWorker;
 import com.themaskedcrusader.tmcz.modules.items.Items;
 import com.themaskedcrusader.tmcz.modules.mobs.Mobs;
+import com.themaskedcrusader.tmcz.modules.mobs.Spawning;
 import com.themaskedcrusader.tmcz.modules.thirst.Thirst;
 import com.themaskedcrusader.tmcz.modules.visibility.Visibility;
 import org.bukkit.ChatColor;
@@ -47,18 +48,19 @@ public class Plugin extends JavaPlugin {
 
     public void onEnable() {
         loadConfiguration();
-//        new DefaultListener(this);
-//        AutoSave.initialize(this);
-//        Bleed.initialize(this);
-//        Game.initialize(this);
-//        Healer.initialize(this);
-//        Health.initialize(this);
-//        Infection.initialize(this);
-//        Items.initialize(this);
+        new DefaultListener(this);
+        AutoSave.initialize(this);
+        Bleed.initialize(this);
+        Game.initialize(this);
+        Healer.initialize(this);
+        Health.initialize(this);
+        Infection.initialize(this);
+        Items.initialize(this);
 //        Stack.initialize(this);
-//        Thirst.initialize(this);
-//        Visibility.initialize(this);
+        Thirst.initialize(this);
+        Visibility.initialize(this);
         Mobs.initialize(this);
+        Spawning.initialize(this);
 
         AutoSave.reloadAllPlayers(this);
         this.getLogger().info("Plugin Plugin Activated");
