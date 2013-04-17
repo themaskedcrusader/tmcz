@@ -16,6 +16,7 @@
 
 package com.themaskedcrusader.tmcz;
 
+import com.themaskedcrusader.bukkit.Library;
 import com.themaskedcrusader.bukkit.config.Messages;
 import com.themaskedcrusader.bukkit.config.Settings;
 import com.themaskedcrusader.tmcz.command.CommandProcessor;
@@ -40,40 +41,49 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.util.logging.Level;
 
 public class Plugin extends JavaPlugin {
-    public File[] libs =  new File[] {
-            new File(getDataFolder(), "tmc-lib.jar"),
-    };
 
     public void onEnable() {
-        loadConfiguration();
-        new DefaultListener(this);
-        AutoSave.initialize(this);
-        Bleed.initialize(this);
-        Game.initialize(this);
-        Healer.initialize(this);
-        Health.initialize(this);
-        Infection.initialize(this);
-        Items.initialize(this);
-//        Stack.initialize(this);
-        Thirst.initialize(this);
-        Visibility.initialize(this);
-        Mobs.initialize(this);
-        Spawning.initialize(this);
+        try {
+            loadConfiguration();
+            new DefaultListener(this);
+            AutoSave.initialize(this);
+            Bleed.initialize(this);
+            Game.initialize(this);
+            Healer.initialize(this);
+            Health.initialize(this);
+            Infection.initialize(this);
+            Items.initialize(this);
+    //        Stack.initialize(this);
+            Thirst.initialize(this);
+            Visibility.initialize(this);
+            Mobs.initialize(this);
+            Spawning.initialize(this);
 
-        AutoSave.reloadAllPlayers(this);
-        this.getLogger().info("Plugin Plugin Activated");
+            AutoSave.reloadAllPlayers(this);
+            this.getLogger().info("Plugin Plugin Activated");
+
+        } catch (NoClassDefFoundError e) {
+            getLogger().log(Level.SEVERE,  "TMC-LIB Library Missing or cannot load: Disabling Plugin.");
+            getLogger().log(Level.SEVERE,  "See install instructions at http://dev.bukkit.org/server-mods/tmc-lib/");
+            getServer().getPluginManager().disablePlugin(this);
+        }
 
     }
 
     public void onDisable() {
-        AutoSave.saveAllPlayers(this);
-        BlockWorker.cleanUpBlocks(true);
+        try {
+            AutoSave.saveAllPlayers(this);
+            BlockWorker.cleanUpBlocks(true);
+        } catch (Error ignored) {
+
+        }
     }
 
     private void loadConfiguration() {
-        LibLoader.loadLibraries(this);
+        Library.checkForNewVersion(getServer().getConsoleSender());
         Settings.init(this);
         Messages.init(this);
     }
