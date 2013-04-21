@@ -83,9 +83,11 @@ public class Plugin extends JavaPlugin {
     }
 
     private void loadConfiguration() {
-        Library.checkForNewVersion(getServer().getConsoleSender());
         Settings.init(this);
         Messages.init(this);
+        if (Settings.getConfig().getBoolean("check-for-updates")) {
+            Library.checkForNewVersion(getServer().getConsoleSender());
+        }
     }
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {

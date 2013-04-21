@@ -17,7 +17,8 @@
 # EXAMPLE:   351|1|10         = 1 piece of lime dye
 # EXAMPLE:   276|2            = 2 diamond swords
 
-debug: true  # If true: some hidden debug features are available for developers.
+debug: true              # If true: some hidden debug features are available for developers.
+check-for-updates: true  # If true: Plugin will check for updates to the required TMC-LIB.
 
 world:
   name: world                # Internal world name of authorized world. Must be specified for certain features to work
