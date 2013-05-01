@@ -35,7 +35,6 @@ public class AutoSave {
     public static final String MINUTES = SYSTEM + ".minutes";
     public static final String RETURN  = SYSTEM + ".return-to-spawn";
 
-    // To suppress instanciability
     private AutoSave() {}
 
     public static void initialize(JavaPlugin plugin) {

@@ -54,4 +54,6 @@ custom-spawn-control:
     vanilla-spawns: false  # If true: allow the standard spawning system to spawn zombies too. (More zombies at night)
     enabled: true          # Use the custom spawning algorithm for zombies. Allows spawn during the daylight
     world-max: 100         # The maximum number of this mob type in the game world.
-    tries-per-cycle: 8     # No. of mobs that the custom spawner will try to spawn each cycle. Some will fail.\
+    tries-per-cycle: 8     # No. of mobs that the custom spawner will try to spawn each cycle. Some will fail.
+    zone-radius: 35        # Number of blocks to check around a chosen spawn for the limit of zombies.
+    zone-limit: 10         # Number of zombies allowed within the zone. If there are more, spawning will be cancelled

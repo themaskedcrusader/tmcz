@@ -87,6 +87,8 @@ public class Plugin extends JavaPlugin {
         Messages.init(this);
         if (Settings.getConfig().getBoolean("check-for-updates")) {
             Library.checkForNewVersion(getServer().getConsoleSender());
+        } else {
+            getServer().getConsoleSender().sendMessage(ChatColor.AQUA + "Update Check Disabled: See http://dev.bukkit.org/server-mods/tmc-lib/ for updates");
         }
     }
 
