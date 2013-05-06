@@ -26,6 +26,10 @@ public class Game {
     public static final String ONLY_ZOMBIES    = SYSTEM + ".only-zombies";
     public static final String PVP             = SYSTEM + ".pvp";
 
+    public static final String SUGAR_SPEED = SYSTEM + ".sugar-speed";
+    public static final String DURATION = ".duration";
+    public static final String MULTIPLIER = ".multiplier";
+
     private static final String START_KIT  = ".start-kit";
     public static final String S_ENABLED   = SYSTEM + START_KIT + ENABLED;
     public static final String S_HELMET    = SYSTEM + START_KIT + ".helmet";
@@ -61,6 +65,9 @@ public class Game {
         if (Settings.getConfig().getBoolean(SYSTEM + ENABLED)) {
             new WorldRules(plugin);
             new GameListener(plugin);
+            if (Settings.getConfig().getBoolean(SUGAR_SPEED + ENABLED)) {
+                new SugarSpeedListener(plugin);
+            }
             plugin.getLogger().info("GAME SYSTEM ONLINE");
         }
     }

@@ -58,6 +58,10 @@ game-system:               ## The core TMCz Game Mechanics
   bandit-healer: 15        # The number of other player heals a bandit must make to lose their bandit tag
   healer-tag: true         # If true: a player who heals other players can be flagged as a healer
   healer-heals: 10         # The number of other player heals a player must make to earn the healer tag
+  sugar-speed:
+    enabled: true          # If true: eating sugar (right click with sugar) will give player a speed potion effect
+    duration: 10           # Seconds for speed potion effect to last
+    multiplier: 1          # Speed potion effect level to give (1 = Speed I, 10 = Speed X, etc)
   start-kit:
     enabled: true          # If true: player's inventory is cleared and they are given these items when game is started
     helmet:   298|1|-1|41  # The following lines are to equip armor when the player starts the game.
