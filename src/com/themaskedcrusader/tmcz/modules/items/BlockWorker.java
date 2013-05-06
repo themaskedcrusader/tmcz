@@ -156,12 +156,16 @@ public class BlockWorker extends Items implements Listener {
     private static void cleanUpPlacedBlocks(boolean force) {
         long now = new Date().getTime();
         for (Map.Entry<Location, BlockBean> entry : placedBlocks.entrySet()) {
-            BlockBean block = entry.getValue();
-            BlockBean info  = allowedItems.get(block.getMaterial().getId());
-            long place = block.getDate().getTime();
-            if (force || now - place > info.getDespawnSeconds() * 1000) {
-                entry.getKey().getWorld().getBlockAt(entry.getKey()).setType(Material.AIR);
-                placedBlocks.remove(entry.getKey());
+            try {
+                BlockBean block = entry.getValue();
+                BlockBean info  = allowedItems.get(block.getMaterial().getId());
+                long place = block.getDate().getTime();
+                if (force || now - place > info.getDespawnSeconds() * 1000) {
+                    entry.getKey().getWorld().getBlockAt(entry.getKey()).setType(Material.AIR);
+                    placedBlocks.remove(entry.getKey());
+                }
+            } catch (Exception ignored) {
+                // prevent CME
             }
         }
     }
