@@ -31,7 +31,6 @@ import java.util.Map;
 public class PlayerUtil {
     private static Map<String, PlayerBean> players = new HashMap<String, PlayerBean>();
 
-    // Suppress instantiability of Utility Class
     private PlayerUtil() {}
 
     public static Map<String, PlayerBean> getPlayers() {

@@ -16,6 +16,11 @@
 
 package com.themaskedcrusader.tmcz.modules.autosave;
 
+import com.themaskedcrusader.bukkit.config.Settings;
+import com.themaskedcrusader.bukkit.util.WorldUtils;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -33,19 +38,29 @@ public class AutoSaveListener implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
+    private void loadPlayerIntoWorld(Player player, World world) {
+        if (WorldUtils.isAllowed(world, Settings.get())) {
+            boolean found = AutoSave.loadPlayer(player, plugin);
+            if (!found) {
+                Location worldSpawn = world.getSpawnLocation();
+                player.teleport(worldSpawn);
+            }
+        }
+    }
+
     @EventHandler
     public void playerLogin(PlayerLoginEvent event) {
-        AutoSave.loadPlayer(event.getPlayer(), plugin);
+        loadPlayerIntoWorld(event.getPlayer(), event.getPlayer().getWorld());
     }
 
     @EventHandler
     public void playerWorldChange(PlayerChangedWorldEvent event) {
-        AutoSave.loadPlayer(event.getPlayer(), plugin);
+        loadPlayerIntoWorld(event.getPlayer(), event.getPlayer().getWorld());
     }
 
     @EventHandler
     public void playerRespawn(PlayerRespawnEvent event) {
-        AutoSave.loadPlayer(event.getPlayer(), plugin);
+        loadPlayerIntoWorld(event.getPlayer(), event.getPlayer().getWorld());
     }
 
     @EventHandler
@@ -55,6 +70,6 @@ public class AutoSaveListener implements Listener {
 
     @EventHandler
     public void playerDie(PlayerDeathEvent event){
-        AutoSave.saveToDisk(event.getEntity(), plugin);
+        AutoSave.removeFromDisk(event.getEntity(), plugin);
     }
 }

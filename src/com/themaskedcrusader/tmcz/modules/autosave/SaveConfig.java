@@ -20,6 +20,7 @@ public class SaveConfig {
 
     // Fields for saving player state
     public static final String UUID = "player.uuid";
+    public static final String PLAYER_NAME = "player.display-name";
     public static final String BLEEDING = "player.is-bleeding";
     public static final String INFECTED = "player.is-infected";
     public static final String ZOMBIE_KILLS = "player.zombie-kills";

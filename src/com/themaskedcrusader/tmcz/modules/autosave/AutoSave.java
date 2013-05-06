@@ -33,11 +33,11 @@ public class AutoSave {
     private static final String SYSTEM = "autosave-system";
     public static final String ENABLED = SYSTEM + ".enabled";
     public static final String MINUTES = SYSTEM + ".minutes";
-    public static final String RETURN  = SYSTEM + ".return-to-spawn";
 
     private AutoSave() {}
 
     public static void initialize(JavaPlugin plugin) {
+        reloadAllPlayers(plugin);
         new AutoSaveListener(plugin);
         if (Settings.getConfig().getBoolean(ENABLED)) {
             new AutoSaveSchedule(plugin);
@@ -48,17 +48,22 @@ public class AutoSave {
     public static boolean loadFromDisk(Player player, JavaPlugin plugin) {
         File playerFile = new File(getFileName(player, plugin));
         if (playerFile.exists()) {
-            FileConfiguration playerConfig = YamlConfiguration.loadConfiguration(playerFile);
-            PlayerBean pb = new PlayerBean(player.getDisplayName());
-            pb.setBleeding(playerConfig.getBoolean(SaveConfig.BLEEDING));
-            pb.setInfected(playerConfig.getBoolean(SaveConfig.INFECTED));
-            pb.setPlayerKills(playerConfig.getInt(SaveConfig.PLAYER_KILLS));
-            pb.setZombieKills(playerConfig.getInt(SaveConfig.ZOMBIE_KILLS));
-            pb.setPlayerHeals(playerConfig.getInt(SaveConfig.PLAYER_HEALS));
-            PlayerUtil.putPlayer(pb);
-            return true;
+            return loadFromDisk(playerFile);
+        } else {
+            return false;
         }
-        return false;
+    }
+
+    private static boolean loadFromDisk(File file) {
+        FileConfiguration playerConfig = YamlConfiguration.loadConfiguration(file);
+        PlayerBean pb = new PlayerBean(playerConfig.getString(SaveConfig.PLAYER_NAME));
+        pb.setBleeding(playerConfig.getBoolean(SaveConfig.BLEEDING));
+        pb.setInfected(playerConfig.getBoolean(SaveConfig.INFECTED));
+        pb.setPlayerKills(playerConfig.getInt(SaveConfig.PLAYER_KILLS));
+        pb.setZombieKills(playerConfig.getInt(SaveConfig.ZOMBIE_KILLS));
+        pb.setPlayerHeals(playerConfig.getInt(SaveConfig.PLAYER_HEALS));
+        PlayerUtil.putPlayer(pb);
+        return true;
     }
 
     public static void saveToDisk(Player player, JavaPlugin plugin) {
@@ -66,6 +71,7 @@ public class AutoSave {
         if (pb != null) {
             File playerConfigFile = new File(getFileName(player, plugin));
             FileConfiguration playerConfig = YamlConfiguration.loadConfiguration(playerConfigFile);
+            playerConfig.set(SaveConfig.PLAYER_NAME, player.getDisplayName());
             playerConfig.set(SaveConfig.BLEEDING, pb.isBleeding());
             playerConfig.set(SaveConfig.INFECTED, pb.isInfected());
             playerConfig.set(SaveConfig.ZOMBIE_KILLS, pb.getZombieKills());
@@ -76,7 +82,6 @@ public class AutoSave {
             } catch (IOException e) {
                 plugin.getLogger().info(e.getMessage());
             }
-
         }
     }
 
@@ -84,7 +89,7 @@ public class AutoSave {
         return plugin.getDataFolder() + "/players/" + player.getDisplayName() + ".yml";
     }
 
-    private static void removeFromDisk(Player player, JavaPlugin plugin) {
+    public static void removeFromDisk(Player player, JavaPlugin plugin) {
         File playerFile = new File(getFileName(player, plugin));
         if (playerFile.exists()) {
             playerFile.delete();
@@ -92,26 +97,25 @@ public class AutoSave {
     }
 
     public static void reloadAllPlayers(JavaPlugin plugin) {
-        World world = WorldUtils.getAuthorizedWorld(plugin, Settings.get());
-        if (world != null) {
-            for (Player player : world.getPlayers()) {
-                loadFromDisk(player, plugin);
-            }
+        File directory = new File(plugin.getDataFolder() + "/players" );
+        for (File file : directory.listFiles()) {
+            loadFromDisk(file);
         }
     }
 
     public static void saveAllPlayers(JavaPlugin plugin) {
-        World world = WorldUtils.getAuthorizedWorld(plugin, Settings.get());
-        for (Player player : world.getPlayers()) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
             saveToDisk(player, plugin);
         }
     }
 
-    public static void loadPlayer(Player player, JavaPlugin plugin) {
-        AutoSave.loadFromDisk(player, plugin);
-        if (PlayerUtil.getPlayer(player) == null) {
-            PlayerUtil.initPlayer(player);
-            AutoSave.saveToDisk(player, plugin);
+    public static boolean loadPlayer(Player player, JavaPlugin plugin) {
+        if (PlayerUtil.getPlayer(player) != null) {
+            AutoSave.loadFromDisk(player, plugin);
+            return (PlayerUtil.getPlayer(player) != null);
+        } else {
+            plugin.getLogger().info(player.getDisplayName() + " already playing, no need to load save game data.");
+            return true;
         }
     }
 }

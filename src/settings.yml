@@ -30,10 +30,8 @@ world:
 #####   INCLUDED MODULES - Enable each individually for customized servers                                         #####
 ########################################################################################################################
 
-
-# TODO: There is an exception in saveToDisk. NoClassDefFound: PlayerUtil
 autosave-system:      # This module runs for all players on the server. Single World Configuration is ignored.
-  enabled: false      # If true: all players data is backed up to disk on a set interval
+  enabled: false      # If true: all tmcz players data is backed up to disk on a set interval
   minutes: 5          # Approximate number of minutes between save intervals, laggy server will have longer intervals
 
 #-----------------------------------------------------------------------------------------------------------------------
@@ -68,7 +66,7 @@ game-system:               ## The core TMCz Game Mechanics
     boots:    301|1|-1|57  # The code will only equip armor that is specified here
     items:                 # Items player is given when spawned into the game. each item is in TMCz Item Format
       - 268|1
-      - 373|1|-1|0
+      - 373|1|-1|0         # These items are demo items and should not be considered the production spawn kit items
       - 299|1
   spawn:
     teleport: true        # If true: the player is teleported to a new location when they start the game
