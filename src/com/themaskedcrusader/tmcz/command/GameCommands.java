@@ -157,14 +157,4 @@ public class GameCommands extends CommandProcessor {
     public static void playerStats(Player player) {
         PlayerUtil.echoKillStats(player, Messages.get());
     }
-
-    public static void rejoinGame(Player player) {
-        if (Settings.getConfig().getBoolean(Game.SYSTEM + Game.ENABLED)) {
-            PlayerUtil.startGame(player);
-            player.sendMessage(ChatColor.AQUA + "Rejoining the game, No other changes made...");
-        }
-    }
-
-
-    // add RejoinGame All
 }

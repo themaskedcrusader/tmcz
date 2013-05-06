@@ -39,7 +39,6 @@ public class CommandProcessor {
             if (args[0].equalsIgnoreCase("spawn"))         { GameCommands.startGame((Player) sender);          return; }
             if (args[0].equalsIgnoreCase("die"))           { GameCommands.killPlayer((Player) sender);         return; }
             if (args[0].equalsIgnoreCase("kills"))         { GameCommands.playerStats((Player) sender);        return; }
-            if (args[0].equalsIgnoreCase("rejoin"))        { GameCommands.rejoinGame((Player) sender);         return; }
             if (args[0].equalsIgnoreCase("addSpawn"))      { WorldCommands.addNewSpawn((Player) sender);       return; }
             if (args[0].equalsIgnoreCase("setWorldSpawn")) { WorldCommands.setWorldSpawn((Player) sender);     return; }
             if (args[0].equalsIgnoreCase("worldName"))     { WorldCommands.tellWorldName((Player) sender);     return; }
