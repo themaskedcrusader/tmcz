@@ -16,17 +16,24 @@
 
 package com.themaskedcrusader.tmcz.modules.mobs;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import com.themaskedcrusader.bukkit.Random;
 import com.themaskedcrusader.bukkit.config.Settings;
 import com.themaskedcrusader.bukkit.util.WorldUtils;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Bat;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Collection;
+import java.util.List;
 
 public class Spawning {
     protected  static JavaPlugin plugin;
@@ -40,6 +47,8 @@ public class Spawning {
     protected static final String WORLD_MAX        = ".world-max";
     protected static final String TRIES_PER_CYCLE  = ".tries-per-cycle";
     protected static final String VANILLA_SPAWNS   = ".vanilla-spawns";
+    protected static final String ZONE_LIMIT       = ".zone-limit";
+    protected static final String ZONE_RADIUS      = ".zone-radius";
 
     protected Spawning() {}
 
@@ -67,12 +76,35 @@ public class Spawning {
             int ry = random.nextIntBetween(0, 256);
             int rz = (chunk.getZ() * 16) + random.nextIntBetween(0, 15);
             Block block = getValidBlock(world, rx, ry, rz);
-            if (block != null && WorldUtils.getNearbyPlayers(block.getLocation(), 24).size() ==  0) {
+            if (block.getType() == Material.LEAVES) {
+                block = getNextLowerValidBlock(block);
+            }
+            if (block != null && WorldUtils.getNearbyPlayers(block.getLocation(), 24).size() ==  0 && validZone(entityType, block)) {
                 LivingEntity entity = (LivingEntity) world.spawnEntity(block.getLocation(),  entityType);
                 CreatureSpawnEvent event = new CreatureSpawnEvent(entity,  CreatureSpawnEvent.SpawnReason.CUSTOM);
                 plugin.getServer().getPluginManager().callEvent(event);
             }
         }
+    }
+
+    private static Block getNextLowerValidBlock(Block block) {
+        for (int i = block.getY() - 1; i > 1; i--) {
+            Block nextBlock = getValidBlock(block.getWorld(), block.getX(), i, block.getZ());
+            if (nextBlock != null) {
+                return nextBlock;
+            }
+        }
+        return null;
+    }
+
+    private static boolean validZone(EntityType et, Block block) {
+        World world = block.getWorld();
+        Location location = block.getLocation();
+        double distance = SpawnControl.getConfig().getDouble(SYSTEM +  et.getName().toLowerCase() + ZONE_RADIUS);
+        LivingEntity entity = (LivingEntity) world.spawnEntity(location, EntityType.BAT);
+        List<Entity> entities = entity.getNearbyEntities(distance, distance, distance);
+        entity.damage(10000000);
+        return entities.size() < SpawnControl.getConfig().getDouble(SYSTEM +  et.getName().toLowerCase() + ZONE_LIMIT);
     }
 
     private static Block getValidBlock(World world, int x, int y, int z) {
