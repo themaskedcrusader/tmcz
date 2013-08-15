@@ -46,31 +46,23 @@ import java.util.logging.Level;
 public class Plugin extends JavaPlugin {
 
     public void onEnable() {
-        try {
-            loadConfiguration();
-            new DefaultListener(this);
-            AutoSave.initialize(this);
-            Bleed.initialize(this);
-            Game.initialize(this);
-            Healer.initialize(this);
-            Health.initialize(this);
-            Infection.initialize(this);
-            Items.initialize(this);
-    //        Stack.initialize(this);
-            Thirst.initialize(this);
-            Visibility.initialize(this);
-            Mobs.initialize(this);
-            Spawning.initialize(this);
+        loadConfiguration();
+        new DefaultListener(this);
+        AutoSave.initialize(this);
+        Bleed.initialize(this);
+        Game.initialize(this);
+        Healer.initialize(this);
+        Health.initialize(this);
+        Infection.initialize(this);
+        Items.initialize(this);
+//        Stack.initialize(this);
+        Thirst.initialize(this);
+        Visibility.initialize(this);
+        Mobs.initialize(this);
+        Spawning.initialize(this);
 
-            AutoSave.reloadAllPlayers(this);
-            this.getLogger().info("Plugin Plugin Activated");
-
-        } catch (NoClassDefFoundError e) {
-            getLogger().log(Level.SEVERE,  "TMC-LIB Library Missing or cannot load: Disabling Plugin.");
-            getLogger().log(Level.SEVERE,  "See install instructions at http://dev.bukkit.org/server-mods/tmc-lib/");
-            getServer().getPluginManager().disablePlugin(this);
-        }
-
+        AutoSave.reloadAllPlayers(this);
+        this.getLogger().info("Plugin Plugin Activated");
     }
 
     public void onDisable() {
@@ -85,11 +77,6 @@ public class Plugin extends JavaPlugin {
     private void loadConfiguration() {
         Settings.init(this);
         Messages.init(this);
-        if (Settings.getConfig().getBoolean("check-for-updates")) {
-            Library.checkForNewVersion(getServer().getConsoleSender());
-        } else {
-            getServer().getConsoleSender().sendMessage(ChatColor.AQUA + "Update Check Disabled: See http://dev.bukkit.org/server-mods/tmc-lib/ for updates");
-        }
     }
 
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {

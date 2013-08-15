@@ -98,8 +98,10 @@ public class AutoSave {
 
     public static void reloadAllPlayers(JavaPlugin plugin) {
         File directory = new File(plugin.getDataFolder() + "/players" );
-        for (File file : directory.listFiles()) {
-            loadFromDisk(file);
+        if (directory.listFiles() != null) {
+            for (File file : directory.listFiles()) {
+                loadFromDisk(file);
+            }
         }
     }
 
