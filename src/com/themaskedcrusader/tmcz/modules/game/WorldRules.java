@@ -56,7 +56,7 @@ public class WorldRules implements Listener {
     @EventHandler
     public void cancelDropsOnGameWorld(EntityDeathEvent event) {
         if (WorldUtils.isAllowed(event.getEntity().getWorld(), Settings.get())) {
-            // TODO: clear drops on game world
+            event.getDrops().clear();
         }
     }
 
@@ -87,7 +87,7 @@ public class WorldRules implements Listener {
     @EventHandler
     public void blockSpawningIfSettingIsSet(CreatureSpawnEvent event) {
         if (WorldUtils.isAllowed(event.getLocation().getWorld(),  Settings.get())) {
-            // TODO: modify this when giants are added
+            if (event.getEntity().getType() == EntityType.GIANT) return;  // explicitly allow giant spawns
             if (Settings.getConfig().getBoolean(Game.ONLY_ZOMBIES) && event.getEntityType() != EntityType.ZOMBIE) {
                 event.setCancelled(true);
             }

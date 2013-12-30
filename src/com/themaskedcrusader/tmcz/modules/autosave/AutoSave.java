@@ -17,10 +17,8 @@
 package com.themaskedcrusader.tmcz.modules.autosave;
 
 import com.themaskedcrusader.bukkit.config.Settings;
-import com.themaskedcrusader.bukkit.util.WorldUtils;
 import com.themaskedcrusader.tmcz.data.PlayerBean;
 import com.themaskedcrusader.tmcz.data.PlayerUtil;
-import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -47,11 +45,7 @@ public class AutoSave {
 
     public static boolean loadFromDisk(Player player, JavaPlugin plugin) {
         File playerFile = new File(getFileName(player, plugin));
-        if (playerFile.exists()) {
-            return loadFromDisk(playerFile);
-        } else {
-            return false;
-        }
+        return playerFile.exists() && loadFromDisk(playerFile);
     }
 
     private static boolean loadFromDisk(File file) {

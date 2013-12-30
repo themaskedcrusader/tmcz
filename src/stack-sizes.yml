@@ -4,6 +4,9 @@
 #
 # Currently, if enabled, these stack size limits are SERVER WIDE! so even your worlds that do not have TMCz
 # running will be affected. In a future release, I'll make this specific only to the TMCz world.
+#
+# SYSTEM IS NOT CURRENTLY IMPLEMENTED - THIS CONFIG FILE IS IGNORED
+#
 
 stack-limits:
   - 30|3      # COBWEBS

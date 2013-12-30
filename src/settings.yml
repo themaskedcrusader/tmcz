@@ -1,21 +1,21 @@
 # Settings Configuration File for TMC Zombie Survival (TMCZ) plugin
 #
-# IMPORTANT!!!  -- THE TMCz ITEM FORMAT --
+# IMPORTANT!!!  -- THE TMCz ITEM FORMAT HAS CHANGED!!!!! --
 #
 #      <ItemId>|<Quantity>|<Data Value>|<Damage Value>
 #
-#  Item ID  = The Internal ID of the item. REQUIRED (Consult Minecraft wiki for Item IDs)
-#  Quantity = The Quantity of the Item. REQUIRED (Always required, but ignored where noted below)
-#  Data     = The Data Value associated with the item. Optional/Required (Consult the Wiki for Appropriate Data values)
-#             NOTE: For potions, this value MUST be -1.
-#  Damage   = The Damage Value of tha item. Optional. If damage value is specified, then data value MUST also be
-#             specified. If you need the damage value, but not the data value, set the data value to  -1.
-#             Consult the wiki for appropriate damage values for items, Specifically potions.
-#             Potions damage values table: http://www.minecraftwiki.net/wiki/Potions#Data_value_table
+#  Item Name = The Internal name of the item. REQUIRED (Consult Minecraft wiki for Item names)
+#  Quantity  = The Quantity of the Item. REQUIRED (Always required, but ignored where noted below)
+#  Data      = The Data Value associated with the item. Optional/Required (Consult the Wiki for Appropriate Data values)
+#              NOTE: For potions, this value MUST be -1.
+#  Damage    = The Damage Value of tha item. Optional. If damage value is specified, then data value MUST also be
+#              specified. If you need the damage value, but not the data value, set the data value to  -1.
+#              Consult the wiki for appropriate damage values for items, Specifically potions.
+#              Potions damage values table: http://www.minecraftwiki.net/wiki/Potions#Data_value_table
 #
-# EXAMPLE:   373|10|-1|16421  = 10 Splash potions of Instant Healing II
-# EXAMPLE:   351|1|10         = 1 piece of lime dye
-# EXAMPLE:   276|2            = 2 diamond swords
+# EXAMPLE:   potion|10|-1|16421  = 10 Splash potions of Instant Healing II
+# EXAMPLE:   dyes|1|10           = 1 piece of lime dye
+# EXAMPLE:   diamond_sword|2     = 2 diamond swords
 
 debug: true              # If true: some hidden debug features are available for developers.
 check-for-updates: true  # If true: Plugin will check for updates to the required TMC-LIB.
@@ -44,7 +44,7 @@ bleed-system:
   chance: 5              # Percent chance that a valid hit will cause bleeding
   damage: 1              # How many health levels are taken each bleed hit
   ticks: 200             # Number of ticks between damage hits when bleeding
-  healer-item: 351|1|1   # Item that healer uses to stop the bleeding in TMCz item format. (qty ignored)
+  healer-item: dyes|1|1   # Item that healer uses to stop the bleeding in TMCz item format. (qty ignored)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -64,20 +64,20 @@ game-system:               ## The core TMCz Game Mechanics
     multiplier: 1          # Speed potion effect level to give (1 = Speed I, 10 = Speed X, etc)
   start-kit:
     enabled: true          # If true: player's inventory is cleared and they are given these items when game is started
-    helmet:   298|1|-1|41  # The following lines are to equip armor when the player starts the game.
-    armor:    299|1|-1|64  # If you don't want the armor to be equipped, delete the row from the file
-    leggings: 300|1|-1|58  # If you want damaged armor to be equipped, be sure to add a damage value
-    boots:    301|1|-1|57  # The code will only equip armor that is specified here
+    helmet:   leather_helmet|1|-1|41     # When someone enters the game, these armor items will be added to the player.
+    armor:    leather_chestplate|1|-1|64 # If you do not want the player to be armed, simply remove the line and the
+    leggings: leather_leggings|1|-1|58   # armor will not be enabled.
+    boots:    leather_boots|1|-1|57
     items:                 # Items player is given when spawned into the game. each item is in TMCz Item Format
-      - 268|1
-      - 373|1|-1|0         # These items are demo items and should not be considered the production spawn kit items
-      - 299|1
+      - wooden_sword|1
+      - potion|1|-1|0      # These items are demo items and should not be considered the production spawn kit items
+      - bread|1
   spawn:
-    teleport: true        # If true: the player is teleported to a new location when they start the game
-    random: true          # If true: will choose a random location within area bound by zone1 and zone2
-    zone1: -100|-100      # One corner of the bounding box for random spawns in <x>|<z> format
-    zone2: 100|100        # Other corner of the bounding box for random spawns in <x>|<z> format
-    static-locations:     # List of static mobs locations. Can be set in game with command /tmcz addspawn
+    teleport: true         # If true: the player is teleported to a new location when they start the game
+    random: true           # If true: will choose a random location within area bound by zone1 and zone2
+    zone1: -100|-100       # One corner of the bounding box for random spawns in <x>|<z> format
+    zone2: 100|100         # Other corner of the bounding box for random spawns in <x>|<z> format
+    static-locations:      # List of static mobs locations. Can be set in game with command /tmcz addspawn
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -102,7 +102,7 @@ infection-system:
   ticks: 600             # Number of ticks between damage hits
   check-ticks: 35        # Number of ticks after start drinking milk to check if finished.
   hurl: true             # If true: Player's food bar will deplete each damage hit
-  healer-item: 351|1|10  # Item that healer uses to cure infection in TMCz item format. (qty ignored)
+  healer-item: dyes|1|10 # Item that healer uses to cure infection in TMCz item format. (qty ignored)
 
 #-----------------------------------------------------------------------------------------------------------------------
 
@@ -123,19 +123,19 @@ item-system:
     enabled: true         # If true: players can harvest melons for melon slices/food
     only-in-game: true    # If true: players can only harvest melons while playing TMCz
     server-wide: false    # If true: any player on the server can harvest melons, only-in-game property ignored.
-    tool-id: 290          # Item ID of tool that can break melons
+    tool: wooden_hoe      # internal item name the tool that can break melons
   mushroom:
     enabled: true         # If true: players can harvest mushrooms for food
     only-in-game: true    # If true: players can only harvest mushrooms while playing TMCz
     server-wide: false    # If true: any player on the server can harvest mushrooms, only-in-game property ignored.
-    tool-id: 256          # Item ID of tool that can harvest mushrooms
+    tool: iron_shovel     # Internal item name of the tool that can harvest mushrooms
     respawn: true         # if True, broken mushrooms respawn after a specified number of seconds
     respawn-seconds: 300  # number of seconds before a mushroom will respawn in its original location
   cobweb:
     enabled: true         # If true: players can break map cobwebs
     only-in-game: true    # If true: players can only break cobwebs while playing TMCz
     server-wide: false    # If true: any player on the server can break cobwebs this way, only-in-game property ignored.
-    tool-id: 290          # Item ID of tool that can break cobwebs
+    tool: wooden_hoe      # Internal item name of the tool that can break cobwebs
     drop: true            # If true: broken cobwebs drop a place-able cobweb item
     respawn: true         # If true: broken cobwebs will re-spawn in their original location
     respawn-seconds: 300  # number of seconds before a cobweb will re-spawn after it is broken
@@ -145,12 +145,12 @@ item-system:
     op-can-build: true    # If true: OPs are exempt from block/item protection and items placed are not tracked
     only-in-game: false   # If true: block protection is only enforced against players who are playing TMCz
     server-wide: false    # If true: block place protection is enforced server-wide. Ignores previous setting
-    allowed-items:        # list of items allowed to be placed in <ItemId>|<Despawn Seconds>|<Respawn Seconds> format
-    - 50|300|-1
-    - 103|60|-1
-    - 77|60|60
-    - 69|60|60
-    - 30|500|-1
+    allowed-items:        # list of items allowed to be placed in <itemName>|<Despawn Seconds>|<Respawn Seconds> format
+    - torch|300|-1
+    - melon_block|60|-1
+    - stone_button|60|60
+    - lever|60|60
+    - web|500|-1
 
     # NOTES:  1. To allow certain placed blocks to not despawn, set the despawn seconds value to -1
     #         2. To allow certain broken blocks to not respawn, set the respawn seconds value to -1
@@ -159,13 +159,15 @@ item-system:
     #         5. Player placed blocks will not respawn, regardless of respawn setting
 #-----------------------------------------------------------------------------------------------------------------------
 
-# Stack limits are applied SERVER WIDE! If you run a server with multi-verse and the TMCz world is only one of many
+# Stack limits are applied SERVER WIDE! If you run a server with multiple worlds and the TMCz world is only one of many
 # worlds on your server, stack limits will apply to your non-TMCz worlds as well. If you want to enabled stack limits
 # only in the TMCz game, you'll have to setup a dedicated server for tmcz and setup cross-server portals to transport
 # your players back and forth. (This is how the lobby of the ShotBow Network works.)
 
 limit-stacks:
   enabled: false
+
+## NOT CURRENTLY IMPLEMENTED
 
 #-----------------------------------------------------------------------------------------------------------------------
 

@@ -53,9 +53,10 @@ public class Bleed {
     }
 
     public static boolean isAllowed(Entity entity) {
-        boolean worldAllowed = WorldUtils.isAllowed(entity.getWorld(), Settings.get());
         if (entity.getType() != EntityType.PLAYER) return false;
         if (Settings.getConfig().getBoolean(SERVER_WIDE)) return true;
+
+        boolean worldAllowed = WorldUtils.isAllowed(entity.getWorld(), Settings.get());
         if (Settings.getConfig().getBoolean(IN_GAME)) return PlayerUtil.isPlaying((Player) entity) && worldAllowed;
         return worldAllowed;
     }

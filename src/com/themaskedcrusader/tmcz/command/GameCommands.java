@@ -78,7 +78,7 @@ public class GameCommands extends CommandProcessor {
                 }
             } catch (Exception e) {
                 String message = "Error parsing KIT information. The format for kits is \n\n" +
-                        "ID | QTY | DATA | DAMAGE\n\n" +
+                        "NAME | QTY | DATA | DAMAGE\n\n" +
                         "Make sure your potions use the DAMAGE value. For more information on items, data " +
                         "and damage, visit the data values page on the MinecraftWiki.";
                 plugin.getLogger().info(message);

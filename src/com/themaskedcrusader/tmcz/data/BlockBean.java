@@ -37,8 +37,8 @@ public class BlockBean {
         this.date = new Date();
     }
 
-    public BlockBean(int id, int despawnSeconds, int respawnSeconds) {
-        this.material = Material.getMaterial(id);
+    public BlockBean(String blockName, int despawnSeconds, int respawnSeconds) {
+        this.material = Material.getMaterial(blockName);
         this.despawnSeconds = despawnSeconds;
         this.respawnSeconds = respawnSeconds;
     }

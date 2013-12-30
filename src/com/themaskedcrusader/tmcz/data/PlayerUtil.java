@@ -31,7 +31,7 @@ import java.util.Map;
 public class PlayerUtil {
     private static Map<String, PlayerBean> players = new HashMap<String, PlayerBean>();
 
-    private PlayerUtil() {}
+    private PlayerUtil() { /* Prevent Initalization */ }
 
     public static Map<String, PlayerBean> getPlayers() {
         return players;

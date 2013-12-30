@@ -16,7 +16,6 @@
 
 package com.themaskedcrusader.tmcz;
 
-import com.themaskedcrusader.bukkit.Library;
 import com.themaskedcrusader.bukkit.config.Messages;
 import com.themaskedcrusader.bukkit.config.Settings;
 import com.themaskedcrusader.tmcz.command.CommandProcessor;
@@ -39,9 +38,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.util.logging.Level;
 
 public class Plugin extends JavaPlugin {
 

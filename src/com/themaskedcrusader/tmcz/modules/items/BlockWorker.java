@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 public class BlockWorker extends Items implements Listener {
-    private static HashMap<Integer, BlockBean> allowedItems = new HashMap<Integer, BlockBean>();
+    private static HashMap<String, BlockBean> allowedItems = new HashMap<String, BlockBean>();
     private static HashMap<Location, BlockBean> placedBlocks = new HashMap<Location, BlockBean>();
     protected static HashMap<Location, BlockBean> brokenBlocks = new HashMap<Location, BlockBean>();
 
@@ -101,11 +101,11 @@ public class BlockWorker extends Items implements Listener {
             } else if (Settings.getConfig().getBoolean(_IN_GAME) && !PlayerUtil.isPlaying(player)) {
                 return true;
             } else {
-                if (!allowedItems.containsKey(block.getTypeId())) { return true; }
-                if (place && allowedItems.get(block.getTypeId()).getDespawnSeconds() == 0)   { return true;   }
-                if (place && allowedItems.get(block.getTypeId()).getDespawnSeconds() == -1)  { return false;  }
-                if (!place && allowedItems.get(block.getTypeId()).getRespawnSeconds() == 0)  { return true;   }
-                if (!place && allowedItems.get(block.getTypeId()).getRespawnSeconds() == -1) { return false;  }
+                if (!allowedItems.containsKey(block.getType().name())) { return true; }
+                if (place && allowedItems.get(block.getType().name()).getDespawnSeconds() == 0)   { return true;   }
+                if (place && allowedItems.get(block.getType().name()).getDespawnSeconds() == -1)  { return false;  }
+                if (!place && allowedItems.get(block.getType().name()).getRespawnSeconds() == 0)  { return true;   }
+                if (!place && allowedItems.get(block.getType().name()).getRespawnSeconds() == -1) { return false;  }
                 tracker.put(block.getLocation(), new BlockBean(block));
             }
         }
@@ -138,10 +138,10 @@ public class BlockWorker extends Items implements Listener {
         for (String s : config) {
             try {
                 String[] item = s.split("\\|");
-                int id = Integer.parseInt(item[0]);
+                String blockName = item[0];
                 int despawnSeconds = Integer.parseInt(item[1]);
                 int respawnSeconds = Integer.parseInt(item[2]);
-                allowedItems.put(id, new BlockBean(id, despawnSeconds, respawnSeconds));
+                allowedItems.put(blockName, new BlockBean(blockName, despawnSeconds, respawnSeconds));
             } catch (Exception e) {
                 plugin.getLogger().info("Error parsing allowed items: incorrect format - [" + s + "]");
             }

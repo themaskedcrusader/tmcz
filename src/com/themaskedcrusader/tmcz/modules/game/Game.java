@@ -20,7 +20,7 @@ import com.themaskedcrusader.bukkit.config.Settings;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Game {
-    public static final String SYSTEM         = "game-system";
+    public static final String SYSTEM          = "game-system";
     public static final String ENABLED         = ".enabled";
     public static final String RETURN_TO_SPAWN = SYSTEM + ".return-to-spawn";
     public static final String ONLY_ZOMBIES    = SYSTEM + ".only-zombies";

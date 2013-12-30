@@ -16,7 +16,6 @@
 
 package com.themaskedcrusader.tmcz.modules.mobs;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.Lister;
 import com.themaskedcrusader.bukkit.Random;
 import com.themaskedcrusader.bukkit.config.Settings;
 import com.themaskedcrusader.bukkit.util.WorldUtils;
@@ -25,14 +24,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Bat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.Collection;
 import java.util.List;
 
 public class Spawning {
