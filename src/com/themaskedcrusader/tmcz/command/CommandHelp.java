@@ -52,7 +52,7 @@ public class CommandHelp extends CommandProcessor {
     }
 
     private static String commandString(String command, String text) {
-        String toReturn = ChatColor.YELLOW + "  /tmcz "  + command;
+        String toReturn = ChatColor.YELLOW + "  /minez "  + command;
         toReturn += ChatColor.AQUA + " : " + text;
         return toReturn;
     }
