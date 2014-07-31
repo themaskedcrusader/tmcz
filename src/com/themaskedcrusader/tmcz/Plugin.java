@@ -16,6 +16,7 @@
 
 package com.themaskedcrusader.tmcz;
 
+import com.themaskedcrusader.bukkit.Library;
 import com.themaskedcrusader.bukkit.config.Messages;
 import com.themaskedcrusader.bukkit.config.Settings;
 import com.themaskedcrusader.tmcz.command.CommandProcessor;
@@ -42,23 +43,31 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Plugin extends JavaPlugin {
 
     public void onEnable() {
-        loadConfiguration();
-        new DefaultListener(this);
-        AutoSave.initialize(this);
-        Bleed.initialize(this);
-        Game.initialize(this);
-        Healer.initialize(this);
-        Health.initialize(this);
-        Infection.initialize(this);
-        Items.initialize(this);
-//        Stack.initialize(this);
-        Thirst.initialize(this);
-        Visibility.initialize(this);
-        Mobs.initialize(this);
-        Spawning.initialize(this);
+        try {
+            if (Library.javaVersionCompatible()) {
+                loadConfiguration();
+                new DefaultListener(this);
+                AutoSave.initialize(this);
+                Bleed.initialize(this);
+                Game.initialize(this);
+                Healer.initialize(this);
+                Health.initialize(this);
+                Infection.initialize(this);
+                Items.initialize(this);
+        //        Stack.initialize(this);
+                Thirst.initialize(this);
+                Visibility.initialize(this);
+                Mobs.initialize(this);
+                Spawning.initialize(this);
 
-        AutoSave.reloadAllPlayers(this);
-        this.getLogger().info("Plugin Plugin Activated");
+                AutoSave.reloadAllPlayers(this);
+                this.getLogger().info("Plugin Plugin Activated");
+            } else {
+                getLogger().info("Wrong version of Java detected. Please update your java to 1.7");
+            }
+        } catch (Error e) {
+            getLogger().info("Uh oh. Something bad happened. Please try again or report a bug.");
+        }
     }
 
     public void onDisable() {
