@@ -1,0 +1,43 @@
+thirst-system:
+  parch-1: Whew... I'm a bit thirsty...
+  parch-2: I'd better find some water soon...
+  parch-3: I'm... I'm a bit parched...
+  parch-4: Dude, I need water NOW!
+  death: Good night, sweet prince.
+  refill: Ahh, that's much better!
+
+bleed-system:
+  hit: Ouch, I think I'm bleeding!
+  message: Augh! I'm still bleeding!
+  stop-own: Ahh, That should stop the bleeding
+  healer-stop:
+  healed-stop:
+
+infection-system:
+  hit: Oooh, I don't feel so well
+  message: Oooh, I really don't feel well
+  cure-self: Ahhh... that feels much better.
+  healer-cure:
+  healed-cure:
+
+game-system:
+  welcome-message: Welcome to the game!
+  kill-stats: Your current Kills - @zombie zombies | @player players
+  zombie-kills: Zombie kills this life -
+
+heal:
+  start:
+    healer: You have applied a bandage to (a)healed
+    healed: (a)healer has applied a bandage to your wounds;
+  ointment:
+    healer: You have applied ointment to (a)healed's wounds
+    healed: (a)healer has applied ointment to your wounds
+  antibiotic:
+    healer: You have applied antibiotic to the (a)healed's wounds of
+    healed: (a)healer has applied antibiotic to your wounds
+  finish:
+    healed: Oooh, that feels good;
+    healer: You have finished healing (a)healed, Enjoy 2 seconds of regeneration
+  fail-1: (a)healed must be bandaged before you can apply ointment or antibiotic
+  fail-2: (a)healed must be bandaged before you can use tweezers
+  out-of-time: You weren't healed in time.

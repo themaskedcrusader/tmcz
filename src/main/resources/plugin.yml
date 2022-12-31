@@ -1,0 +1,10 @@
+name: tmcz
+main: me.schalk.spigot.tmcz.Plugin
+version: 1.0-indev
+description: Zombie Survival Game Mode - MineZ Clone
+author: Chris Schalk - The Masked Crusader
+website: coming soon
+
+load: STARTUP
+depend: [tmc-lib]
+api-version: 1.19
