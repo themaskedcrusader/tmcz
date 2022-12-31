@@ -52,11 +52,11 @@ bleed-system:
   enabled: false         # If true: player bleeding system is activated
   only-in-game: false    # If true: Bleed system only works for players who are playing TMCz
   server-wide: false     # If true: Bleed System affects all worlds on server, only-in-game property ignored.
-  seconds: 3             # Number of seconds of Blindness player gets per damage hit
+  particles: 3           # Number of blood particles to display per damage hit
   chance: 5              # Percent chance that a valid hit will cause bleeding
-  damage: 1              # How many health levels are taken each bleed hit
+  damage: 1              # How many health levels are taken each bleed hit (half hearts)
   ticks: 200             # Number of ticks between damage hits when bleeding
-  healer-item: dyes|1|1   # Item that healer uses to stop the bleeding in TMCz item format. (qty ignored)
+  healer-item: PAPER     # Item that healer uses to stop the bleeding (currently only supports items in minecraft:)
 
 #-----------------------------------------------------------------------------------------------------------------------
 

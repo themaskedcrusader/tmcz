@@ -26,19 +26,25 @@ import me.schalk.spigot.lib.config.getMessages
 import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.lib.math.getChancePercentage
 import me.schalk.spigot.tmcz.data.GameData
+import me.schalk.spigot.tmcz.modules.bleed.BleedSchedule.Companion.plugin
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.Particle
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.block.Action
 import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerInteractEntityEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
-class BleedListener(plugin: JavaPlugin) : BleedModule() {
+class BleedListener(val plugin: JavaPlugin) : BleedModule() {
 
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
@@ -49,17 +55,18 @@ class BleedListener(plugin: JavaPlugin) : BleedModule() {
         if (isAllowed(event.entity)) {
             val player = event.entity as Player
             val chanceConfiguration: Int = getSettings().getConfig().getInt(MODULE + CHANCE)
-            if (chanceConfiguration > getChancePercentage() && !GameData.getPlayer(event.entity as Player).bleeding) {
+            val chanceCalculation = getChancePercentage()
+            if (chanceConfiguration >= chanceCalculation && !GameData.getPlayer(event.entity as Player).bleeding) {
+                println("You should be bleeding now, what was the cause: ${event.cause}")
                 if (event.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK
                     || event.cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION
                     || event.cause == EntityDamageEvent.DamageCause.FALL
                     || event.cause == EntityDamageEvent.DamageCause.FIRE_TICK
-                    || event.cause == EntityDamageEvent.DamageCause.PROJECTILE)
+                    || event.cause == EntityDamageEvent.DamageCause.PROJECTILE
+                    || event.cause == EntityDamageEvent.DamageCause.CONTACT)
                 {
-                    val seconds: Int = getSettings().getConfig().getInt(MODULE + SECONDS) * 20
-                    val bleed = PotionEffect(PotionEffectType.BLINDNESS!!, seconds, 1)
                     player.sendMessage(ChatColor.RED.toString() + getMessages().getConfig().getString(MODULE + HIT_MSG))
-                    player.addPotionEffect(bleed)
+                    player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, getSettings().getConfig().getInt(MODULE + PARTICLES))
                     GameData.getPlayer(event.entity as Player).bleeding = true
                 }
             }
@@ -67,13 +74,49 @@ class BleedListener(plugin: JavaPlugin) : BleedModule() {
     }
 
     @EventHandler
-    fun stopBleedWithBandage(event: PlayerInteractEvent) {
+    fun stopBleedingUponDeath(event: PlayerDeathEvent) {
+        if (isAllowed(event.entity)) {
+            if (GameData.getPlayer(event.entity).bleeding && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM) {
+                event.deathMessage = getMessages().getConfig().getString(MODULE + DEATH_MESSAGE)
+                    ?.replace("__player", event.entity.displayName)
+            }
+            println("Death Cause: " + event.entity.lastDamageCause?.cause)
+            // TODO, set bled-out death message
+            GameData.getPlayer(event.entity).bleeding = false
+        }
+    }
+
+    @EventHandler
+    fun selfStopBleedingWithBandage(event: PlayerInteractEvent) {
         if (isAllowed(event.player)) {
             val player = event.player
             if ((event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK) &&
-                player.inventory.itemInMainHand.type == Material.PAPER // TODO: update this to configured healer item
+                player.inventory.itemInMainHand.type == BANDAGE
             ) {
                 useBandage(player)
+            }
+        }
+    }
+
+    @EventHandler
+    fun healerStopsBleedingWithBandage(event: PlayerInteractEntityEvent) {
+        if (isAllowed(event.player)) {
+            val healer = event.player
+            val healerName = healer.name
+            if (event.rightClicked.type == EntityType.PLAYER && healer.inventory.itemInMainHand.type == BANDAGE) {
+                val healedName = event.rightClicked.name
+                val healed = Bukkit.getPlayerExact(healedName)
+                if (healed != null) {
+                    if (GameData.getPlayer(healed).bleeding) {
+                        GameData.getPlayer(healed).bleeding = false
+                        healer.inventory.itemInMainHand.amount--
+                        healer.sendMessage(ChatColor.GREEN.toString() + getMessages().getConfig().getString(MODULE + HEALER_MESSAGE)
+                            ?.replace("__healed", healedName))
+                        healed.sendMessage(ChatColor.GREEN.toString() + getMessages().getConfig().getString(MODULE + HEALED_MESSAGE)
+                            ?.replace("__healer", healerName)
+                        )
+                    }
+                }
             }
         }
     }

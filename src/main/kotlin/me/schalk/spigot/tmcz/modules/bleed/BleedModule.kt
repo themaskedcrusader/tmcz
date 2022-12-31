@@ -24,34 +24,46 @@ package me.schalk.spigot.tmcz.modules.bleed
 
 import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.tmcz.data.GameData
+import org.bukkit.Material
 import me.schalk.spigot.lib.util.isAllowed as isWorldAllowed
 import org.bukkit.entity.Entity
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.logging.Level
 
 abstract class BleedModule : Listener {
 
     companion object {
         // constants for the Bleed System
-        const val MODULE        = "bleed-system"
-        const val ENABLED       = ".enabled"
-        const val IN_GAME       = ".only-in-game"
-        const val SERVER_WIDE   = ".server-wide"
-        const val SECONDS       = ".seconds"
-        const val CHANCE        = ".chance"
-        const val DAMAGE        = ".damage"
-        const val TICKS         = ".ticks"
-        const val APPROVED_ITEM = ".healer-item" // TODO: Implement
+        const val MODULE            = "bleed-system"
+        const val ENABLED           = ".enabled"
+        const val IN_GAME           = ".only-in-game"
+        const val SERVER_WIDE       = ".server-wide"
+        const val PARTICLES         = ".particles"
+        const val CHANCE            = ".chance"
+        const val DAMAGE            = ".damage"
+        const val TICKS             = ".ticks"
+        const val APPROVED_ITEM     = ".healer-item"
+        lateinit var BANDAGE        : Material
 
         // message keys for Bleed System
-        const val MESSAGE = MODULE + ".message"
-        const val HIT_MSG = MODULE + ".hit"
-        const val SELF_STOP = MODULE + ".stop-own"
+        const val MESSAGE           = ".message"
+        const val HIT_MSG           = ".hit"
+        const val SELF_STOP         = ".stop-own"
+        const val DEATH_MESSAGE     = ".death-message"
+        const val HEALER_MESSAGE    = ".healer-stop"
+        const val HEALED_MESSAGE    = ".healed-stop"
 
         fun initialize(plugin: JavaPlugin) {
             if (getSettings().getConfig().getBoolean(MODULE + ENABLED)) {
+                val configuredBandage = Material.getMaterial(getSettings().getConfig().getString(MODULE + APPROVED_ITEM)!!.uppercase())
+                if (configuredBandage == null) {
+                    plugin.logger.log(Level.SEVERE, "Approved bandage not a valid Minecraft Material")
+                } else {
+                    BANDAGE = configuredBandage
+                }
                 BleedListener(plugin)
                 BleedSchedule(plugin)
                 plugin.logger.info("Bleed System Online!")

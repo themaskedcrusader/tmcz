@@ -26,10 +26,9 @@ import me.schalk.spigot.lib.config.getMessages
 import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.tmcz.data.GameData
 import org.bukkit.ChatColor
+import org.bukkit.Particle
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
-import org.bukkit.potion.PotionEffect
-import org.bukkit.potion.PotionEffectType
 
 class BleedSchedule(plugin: JavaPlugin) : BleedModule() {
 
@@ -48,12 +47,10 @@ class BleedSchedule(plugin: JavaPlugin) : BleedModule() {
             val players: Collection<Player> = plugin.server.onlinePlayers
             players.forEach{ player ->
                 if (isAllowed(player) && GameData.getPlayer(player).bleeding) {
-                    val seconds: Int = getSettings().getConfig().getInt(MODULE + SECONDS) * 20
-                    val damage: Int = getSettings().getConfig().getInt(MODULE + DAMAGE) * 13
-                    val bleedPotion = PotionEffect(PotionEffectType.BLINDNESS, seconds, 1)
-                    val bleedDamage = PotionEffect(PotionEffectType.POISON, damage, 1)
-                    player.addPotionEffect(bleedPotion)
-                    player.addPotionEffect(bleedDamage)
+                    plugin.server.scheduler.runTaskLater(plugin, Runnable {
+                        player.damage(getSettings().getConfig().getDouble(MODULE + DAMAGE))
+                        player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, getSettings().getConfig().getInt(MODULE + PARTICLES))
+                                                                          }, 10)
                     player.sendMessage(ChatColor.RED.toString() + getMessages().getConfig().getString(MODULE + MESSAGE))
                 }
             }

@@ -10,8 +10,9 @@ bleed-system:
   hit: Ouch, I think I'm bleeding!
   message: Augh! I'm still bleeding!
   stop-own: Ahh, That should stop the bleeding
-  healer-stop:
-  healed-stop:
+  healer-stop: You have stopped __healed's bleeding with a bandage
+  healed-stop: Your bleeding has been stanched by __healer's bandage
+  death-message: __player bled out. Gotta keep that blood inside you!
 
 infection-system:
   hit: Oooh, I don't feel so well
@@ -22,22 +23,22 @@ infection-system:
 
 game-system:
   welcome-message: Welcome to the game!
-  kill-stats: Your current Kills - @zombie zombies | @player players
+  kill-stats: Your current Kills - __zombie zombies | __player players
   zombie-kills: Zombie kills this life -
 
 heal:
   start:
-    healer: You have applied a bandage to (a)healed
-    healed: (a)healer has applied a bandage to your wounds;
+    healer: You have applied a bandage to __healed
+    healed: __healer has applied a bandage to your wounds;
   ointment:
-    healer: You have applied ointment to (a)healed's wounds
-    healed: (a)healer has applied ointment to your wounds
+    healer: You have applied ointment to __healed's wounds
+    healed: __healer has applied ointment to your wounds
   antibiotic:
-    healer: You have applied antibiotic to the (a)healed's wounds of
-    healed: (a)healer has applied antibiotic to your wounds
+    healer: You have applied antibiotic to the __healed's wounds of
+    healed: __healer has applied antibiotic to your wounds
   finish:
     healed: Oooh, that feels good;
-    healer: You have finished healing (a)healed, Enjoy 2 seconds of regeneration
-  fail-1: (a)healed must be bandaged before you can apply ointment or antibiotic
-  fail-2: (a)healed must be bandaged before you can use tweezers
+    healer: You have finished healing __healed, Enjoy 2 seconds of regeneration
+  fail-1: __healed must be bandaged before you can apply ointment or antibiotic
+  fail-2: __healed must be bandaged before you can use tweezers
   out-of-time: You weren't healed in time.
