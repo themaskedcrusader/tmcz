@@ -57,7 +57,6 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
             val chanceConfiguration: Int = getSettings().getConfig().getInt(MODULE + CHANCE)
             val chanceCalculation = getChancePercentage()
             if (chanceConfiguration >= chanceCalculation && !GameData.getPlayer(event.entity as Player).bleeding) {
-                println("You should be bleeding now, what was the cause: ${event.cause}")
                 if (event.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK
                     || event.cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION
                     || event.cause == EntityDamageEvent.DamageCause.FALL
@@ -81,7 +80,6 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
                     ?.replace("__player", event.entity.displayName)
             }
             println("Death Cause: " + event.entity.lastDamageCause?.cause)
-            // TODO, set bled-out death message
             GameData.getPlayer(event.entity).bleeding = false
         }
     }

@@ -48,6 +48,11 @@ autosave-system:      # This module runs for all players on the server. Single W
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+# The Bleed System introduces gameplay where getting hurt by different types of damage causes you to bleed. Bleeding
+# can be stopped by applying a bandage. The player can bleed out and die if the bleeding is not stopped before they
+# lose all of their hearts. See below for configuration options.
+# TODO: Feature complete
+
 bleed-system:
   enabled: false         # If true: player bleeding system is activated
   only-in-game: false    # If true: Bleed system only works for players who are playing TMCz
@@ -122,7 +127,7 @@ infection-system:
 # at the top of this configuration file, as if WorldGuard were enabled. Only players with the tmcz.builder permission
 # and Server Operators will have the ability to build and break freely. All other block interactions will be
 # according to the following configurations
-# TODO: Coding done - Verify all settings do what they say they do - especially repsawn on Melon, Mushroom and Cobweb
+# TODO: Feature Complete - Testing required - especially repsawn on Melon, Mushroom and Cobweb
 
 item-system:
   enabled: true           # If true: the following custom item interactions are enabled
@@ -205,6 +210,7 @@ thirst-system:
 
 #### VISIBILITY SYSTEM CURRENTLY INCOMPLETE, ENABLE AT YOUR OWN RISK
 # NOTE: VISIBILITY SYSTEM ONLY WORKS IF SINGLE-WORLD IS ENABLED AT THE TOP OF THIS FILE.
+# TODO: Should be done. Need in-game testing
 
 visibility-system:
   enabled: false       # If true: Visibility system will be activated (currently display only)

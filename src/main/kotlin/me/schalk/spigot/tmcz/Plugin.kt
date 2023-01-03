@@ -6,6 +6,7 @@ import me.schalk.spigot.lib.javaVersionCompatible
 import me.schalk.spigot.tmcz.modules.bleed.BleedModule
 import me.schalk.spigot.tmcz.modules.items.BlockListener
 import me.schalk.spigot.tmcz.modules.items.ItemModule
+import me.schalk.spigot.tmcz.modules.visibility.VisibilityModule
 import org.bukkit.plugin.java.JavaPlugin
 
 class Plugin : JavaPlugin() {
@@ -25,7 +26,7 @@ class Plugin : JavaPlugin() {
 
             BleedModule.initialize(this)
             ItemModule.initialize(this)
-
+            VisibilityModule.initialize(this)
 
             server.logger.info("TMCz Plugin Loaded")
         }
