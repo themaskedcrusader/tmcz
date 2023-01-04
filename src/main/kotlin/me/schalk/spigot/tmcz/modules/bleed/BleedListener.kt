@@ -72,7 +72,7 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     fun stopBleedingUponDeath(event: PlayerDeathEvent) {
         if (isAllowed(event.entity)) {
             if (GameData.getPlayer(event.entity).bleeding && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM) {
