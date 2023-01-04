@@ -197,7 +197,9 @@ thirst-system:
   damage-ticks: 60     # When thirst is at 0, number of ticks between damage hits
   damage-hit: 1        # Amount of health each damage hit takes
   full: 20             # How many levels equals a fully quenched player
-  refill: 20           # How many levels drinking water will restore
+  refill-water: 9      # How many levels drinking water will restore
+  refill-potion: 5     # How many levels drinking a potion will restore
+  break-chance: 20     # Percent chance that the water bottle will break
   check-ticks: 35      # How many ticks after player begins drinking will the plugin check to see if player finished.
   start: 10            # Player's thirst level when they spawn into the game
   parch-1: 10          # What level will message thirst.parch-1 display to player

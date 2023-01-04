@@ -1,0 +1,106 @@
+/*
+ * Copyright (c) 2013 - 2023 Christopher Schalk
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+package me.schalk.spigot.tmcz.modules.thirst
+
+import me.schalk.spigot.lib.config.getMessages
+import me.schalk.spigot.lib.config.getSettings
+import me.schalk.spigot.lib.serializer.abovePlayerHead
+import me.schalk.spigot.tmcz.data.GameData
+import org.bukkit.ChatColor
+import org.bukkit.Particle
+import org.bukkit.entity.Player
+import org.bukkit.plugin.java.JavaPlugin
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
+
+class ThirstSchedule(plugin: JavaPlugin) : ThirstModule() {
+    
+    init{
+        ThirstSchedule.plugin = plugin
+        
+        // Schedule to calculate thirst
+        plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
+            { calculateThirst() }, 20L, getSettings().getConfig().getLong(TICKS)
+        )
+
+        // Schedule to damage due to thirst
+        plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
+            { calculateThirstDamage() }, 20L, getSettings().getConfig().getLong(DAMAGE_TICKS)
+        )
+    }
+
+    companion object {
+        private lateinit var plugin: JavaPlugin
+
+        fun calculateThirst() {
+            val players = plugin.server.onlinePlayers
+            players.forEach{ player ->
+                if (isAllowed(player) && player.level > 0) {
+                    player.level = player.level - 1
+                    sendPlayerThirstMessage(player)
+                    plugin.server.scheduler.runTaskLater(plugin, Runnable {
+                        val location = abovePlayerHead(player.location)
+                        player.spawnParticle(Particle.BUBBLE_POP, location.x, location.y, location.z, 1, 0.2, 0.2, 0.2, 0.01)
+                    }, 5)
+                }
+            }
+        }
+
+        fun calculateThirstDamage() {
+            val players = plugin.server.onlinePlayers
+            for (player in players) {
+                if (isAllowed(player) && player.level == 0) {
+                    GameData.getPlayer(player).thirsty = true
+                    if (!player.isOp || !getSettings().getConfig().getBoolean("world.op-is-god")) {
+                        player.damage(getSettings().getConfig().getInt(DAMAGE_HIT).toDouble())
+                        val location = abovePlayerHead(player.location)
+                        player.spawnParticle(Particle.BUBBLE_POP, location.x, location.y, location.z, 3, 0.3, 0.3, 0.3, 0.01)
+                    }
+                    if (player.health <= 4.0) {
+                        if (!player.hasPotionEffect(PotionEffectType.CONFUSION)) {
+                            player.addPotionEffect(PotionEffect(PotionEffectType.CONFUSION,500, 255, false, false, false))
+                        }
+                    }
+                }
+            }
+        }
+
+        private fun sendPlayerThirstMessage(player: Player) {
+            val message = ChatColor.YELLOW.toString()
+            when (player.level) {
+                getSettings().getConfig().getInt(PARCH_1) -> {
+                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_1_MSG))
+                }
+                getSettings().getConfig().getInt(PARCH_2) -> {
+                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_2_MSG))
+                }
+                getSettings().getConfig().getInt(PARCH_3) -> {
+                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_3_MSG))
+                }
+                getSettings().getConfig().getInt(PARCH_4) -> {
+                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_4_MSG))
+                }
+            }
+        }
+    }
+}

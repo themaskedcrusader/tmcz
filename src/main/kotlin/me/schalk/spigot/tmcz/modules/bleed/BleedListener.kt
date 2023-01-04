@@ -79,7 +79,6 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
                 event.deathMessage = getMessages().getConfig().getString(MODULE + DEATH_MESSAGE)
                     ?.replace("__player", event.entity.displayName)
             }
-            println("Death Cause: " + event.entity.lastDamageCause?.cause)
             GameData.getPlayer(event.entity).bleeding = false
         }
     }

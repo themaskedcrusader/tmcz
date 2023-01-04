@@ -26,11 +26,12 @@ import org.bukkit.entity.Player
 
 sealed class GameData {
     data class PlayerBean(val playerId: String) {
+        var antibiotic = false
+        var bandaged = false
         var bleeding = false
         var infected = false
-        var bandaged = false
         var ointment = false
-        var antibiotic = false
+        var thirsty = false
         var zombieKills = 0
             private set
         var playerKills = 0
