@@ -53,8 +53,7 @@ class ThirstSchedule(plugin: JavaPlugin) : ThirstModule() {
         private lateinit var plugin: JavaPlugin
 
         fun calculateThirst() {
-            val players = plugin.server.onlinePlayers
-            players.forEach{ player ->
+            plugin.server.onlinePlayers.forEach{ player ->
                 if (isAllowed(player) && player.level > 0) {
                     player.level = player.level - 1
                     sendPlayerThirstMessage(player)
@@ -67,8 +66,7 @@ class ThirstSchedule(plugin: JavaPlugin) : ThirstModule() {
         }
 
         fun calculateThirstDamage() {
-            val players = plugin.server.onlinePlayers
-            for (player in players) {
+            plugin.server.onlinePlayers.forEach{ player ->
                 if (isAllowed(player) && player.level == 0) {
                     GameData.getPlayer(player).thirsty = true
                     if (!player.isOp || !getSettings().getConfig().getBoolean("world.op-is-god")) {

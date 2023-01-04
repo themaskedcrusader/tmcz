@@ -65,7 +65,7 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
                     || event.cause == EntityDamageEvent.DamageCause.CONTACT)
                 {
                     player.sendMessage(ChatColor.RED.toString() + getMessages().getConfig().getString(MODULE + HIT_MSG))
-                    player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, getSettings().getConfig().getInt(MODULE + PARTICLES))
+                    player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, getSettings().getConfig().getInt(MODULE + PARTICLES), 0.2, 0.2, 0.2, 0.01)
                     GameData.getPlayer(event.entity as Player).bleeding = true
                 }
             }
