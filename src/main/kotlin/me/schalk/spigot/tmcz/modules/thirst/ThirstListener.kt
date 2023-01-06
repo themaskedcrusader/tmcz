@@ -24,6 +24,7 @@ package me.schalk.spigot.tmcz.modules.thirst
 
 import me.schalk.spigot.lib.config.getMessages
 import me.schalk.spigot.lib.config.getSettings
+import me.schalk.spigot.lib.math.nextRandomIntBetween
 import me.schalk.spigot.tmcz.data.GameData
 import me.schalk.spigot.tmcz.modules.bleed.BleedModule
 import org.bukkit.Material
@@ -67,6 +68,12 @@ class ThirstListener(val plugin: JavaPlugin) : ThirstModule() {
             event.player.level = (event.player.level + restored).coerceAtMost(getSettings().getConfig().getInt(FULL))
             event.player.removePotionEffect(PotionEffectType.CONFUSION)
             GameData.getPlayer(event.player).thirsty = false
+            val breakChance = nextRandomIntBetween(0, 100)
+            if (getSettings().getConfig().getInt(BREAK_CHANCE) > breakChance) {
+                val item = event.player.inventory.itemInMainHand
+                event.player.inventory.remove(item)
+            }
+            event.player.sendMessage(getMessages().getConfig().getString(REFILL_MESSAGE))
         }
     }
 

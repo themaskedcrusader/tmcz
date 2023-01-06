@@ -29,18 +29,27 @@
 # EXAMPLE:   POTION|1|0|LUCK|FALSE|FALSE|Not so lucky, eh|Luck -1
 #                Regular LUCK I potion. with Lore Text "Not so lucky, eh" and display name "Luck -1"
 
+# These two options are (TODO): not yet implemented
+
 debug: true              # If true: some hidden debug features are available for developers.
 check-for-updates: true  # If true: Plugin will check for updates to the required TMC-LIB.
+
+# This section defines the world where TMCz Zombie Survival will be played out.
 
 world:
   name: world                # Internal world name of authorized world. Must be specified for certain features to work
   single: true               # If false: dependant modules are active on all server worlds
-  op-is-god: true            # If true: any OP player will not take damage
+  op-is-god: true            # If true: any OP player will not take damage caused by modules below
   record-zombie-death: true  # If true: Plugin will track all zombie kills across specified world.
 
 ########################################################################################################################
 #####   INCLUDED MODULES - Enable each individually for customized servers                                         #####
 ########################################################################################################################
+
+# The autosave system, when enabled, will continually save the current game state of all players to disk, and when the
+# server starts up will load the saved states into memory so that when players reconnect, they'll start when and where
+# they were.
+# TODO: NOT IMPLEMENTED YET
 
 autosave-system:      # This module runs for all players on the server. Single World Configuration is ignored.
   enabled: false      # If true: all tmcz players data is backed up to disk on a set interval
@@ -64,6 +73,11 @@ bleed-system:
   healer-item: PAPER     # Item that healer uses to stop the bleeding (currently only supports items in minecraft:)
 
 #-----------------------------------------------------------------------------------------------------------------------
+
+# This is the core of TMCz (MineZ Clone). The settings in this module regulate nearly every aspect of the actual game.
+# The other systems add other aspects of the game, but this control the rules. When this plugin is paired with a
+# specifically curated map, this can create a very enjoyable game play experience.
+# TODO: NOT IMPLEMENTED YET
 
 game-system:               ## The core TMCz Game Mechanics
   enabled: false           # If true, the TMCz game play is enabled on the specified world
@@ -98,6 +112,11 @@ game-system:               ## The core TMCz Game Mechanics
 
 #-----------------------------------------------------------------------------------------------------------------------
 
+# The health system controls how many hearts of health a player has. By default, the player has 20 points of health, or
+# 10 hearts. However, that can be modified here. You can configure your server to limit the number of hearts a player
+# can have.
+# TODO: NOT IMPLEMENTED YET
+
 health-system:
   enabled: false       # If true: Health System is active
   only-in-game: false  # If true: Health system only works for players who are playing TMCz
@@ -108,6 +127,12 @@ health-system:
   food-gives: true     # If true: Eating food will restore health
 
 #-----------------------------------------------------------------------------------------------------------------------
+
+# The infection system introduces gameplay mechanic where damage from a zombie has a chance to infect the player. An
+# infected player will take damage as the infection spreads until it leads to death. The player or another player
+# can administer antibiotics which will cure the infection. However, the longer the player has been infected, the more
+# antibiotic will need to be applied to kill the infection.
+# TODO: NOT IMPLEMENTED YET
 
 infection-system:
   enabled: false         # If true, Infection system is activated
@@ -125,9 +150,9 @@ infection-system:
 
 # PLEASE NOTE: If this system is enabled, all block breaking and placing will be prohibited on the world configured
 # at the top of this configuration file, as if WorldGuard were enabled. Only players with the tmcz.builder permission
-# and Server Operators will have the ability to build and break freely. All other block interactions will be
+# and Server Operators will have the ability to build and break freely. All other block interactions will be tracked
 # according to the following configurations
-# TODO: Feature Complete - Testing required - especially repsawn on Melon, Mushroom and Cobweb
+# TODO: Feature Complete
 
 item-system:
   enabled: true           # If true: the following custom item interactions are enabled
@@ -177,17 +202,21 @@ item-system:
     #         5. Player placed blocks will not respawn, regardless of respawn setting
 #-----------------------------------------------------------------------------------------------------------------------
 
-# Stack limits are applied SERVER WIDE! If you run a server with multiple worlds and the TMCz world is only one of many
-# worlds on your server, stack limits will apply to your non-TMCz worlds as well. If you want to enabled stack limits
-# only in the TMCz game, you'll have to setup a dedicated server for tmcz and setup cross-server portals to transport
-# your players back and forth. (This is how the lobby of the ShotBow Network works.)
+# Stack limits are only able to be applied SERVER WIDE! If you run a server with multiple worlds and the Zombie world
+# is only one of many worlds on your server, stack limits will apply to your Zombie Survival worlds as well. If you
+# want to enabled stack limits only in the Zombie Survival game, you'll have to setup a dedicated server for TMCz and
+# setup cross-server portals to transport your players back and forth. (This is how the lobby of the ShotBow Network works.)
+# TODO: Not Implemented Yet
 
 limit-stacks:
   enabled: false
 
-## NOT CURRENTLY IMPLEMENTED
-
 #-----------------------------------------------------------------------------------------------------------------------
+
+# The Thirst System introduces gameplay where the player will continually get thirsty and will have to drink water in
+# order to stay hydrated. The Level number is the player's Hydration number. When it hits zero, the player begins
+# to take thirst damage, which can lead to death.
+# TODO: Feature Complete
 
 thirst-system:
   enabled: false       # If true: Player thirst system will be activated
@@ -200,19 +229,18 @@ thirst-system:
   refill-water: 9      # How many levels drinking water will restore
   refill-potion: 5     # How many levels drinking a potion will restore
   break-chance: 20     # Percent chance that the water bottle will break
-  check-ticks: 35      # How many ticks after player begins drinking will the plugin check to see if player finished.
   start: 10            # Player's thirst level when they spawn into the game
   parch-1: 10          # What level will message thirst.parch-1 display to player
   parch-2: 7           # What level will message thirst.parch-2 display to player
   parch-3: 3           # What level will message thirst.parch-3 display to player
   parch-4: 1           # What level will message thirst.parch-4 display to player
-  death-lvl: 1         # What level will message thirst.death   display to player
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-#### VISIBILITY SYSTEM CURRENTLY INCOMPLETE, ENABLE AT YOUR OWN RISK
-# NOTE: VISIBILITY SYSTEM ONLY WORKS IF SINGLE-WORLD IS ENABLED AT THE TOP OF THIS FILE.
-# TODO: Should be done. Need in-game testing
+# The visibility system enhances the built-in visibility system within Minecraft. Crouching by default will cause the
+# player to be less noticeable to mobs. This visibility system uses the experience bar to visually display how loud
+# the player is in their environment, and the quieter the player is, the less they'll be noticed by mobs.
+# TODO: Feature Complete
 
 visibility-system:
   enabled: false       # If true: Visibility system will be activated (currently display only)
@@ -222,12 +250,17 @@ visibility-system:
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-# The mob-controls section modifies certain characteristics of existing vanilla mobs.
-# Mob controls currently only work on world specified at the top of this file.
+# The mob-controls section modifies certain characteristics of existing vanilla mobs, specifically zombies since this
+# is a Zombie Survival game. These configurations are currently server-wide.
+# TODO: Zombie Complete
+# TODO: Suppress other mobs not complete yet
 
 mob-controls:
-  zombies:
-    can-burn: false        # If true: Zombies will burn in the daylight.
+  zombie:                   # Special controls for Zombies, since this is a zombie survival game
+    enabled: true           # if true: following zombie configs are activated
+    can-burn: false         # If true: Zombies will burn in the daylight.
+    head-hides: true        # if true: Zombies will randomly drop a zombie head, wearing head hides you from targeting
+    head-drop-chance: 1000  # 1-out-of-x chance that a zombie will drop a head.
+    head-break-chance: 20   # 1-out-of-x chance that a worn zombie head will break when player takes damage
 
-
-#--------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------------

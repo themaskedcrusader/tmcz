@@ -51,8 +51,6 @@ abstract class ThirstModule : Listener {
         const val PARCH_2       = "$MODULE.parch-2"
         const val PARCH_3       = "$MODULE.parch-3"
         const val PARCH_4       = "$MODULE.parch-4"
-        const val DEATH_LVL     = "$MODULE.death-lvl"
-        const val CHECK_TICKS   = "$MODULE.check-ticks"
 
         // Messages for Thirst System
         const val PARCH_1_MSG   = "$MODULE.parch-1"
@@ -60,7 +58,7 @@ abstract class ThirstModule : Listener {
         const val PARCH_3_MSG   = "$MODULE.parch-3"
         const val PARCH_4_MSG   = "$MODULE.parch-4"
         const val DEATH_MESSAGE = "$MODULE.death"
-        const val REFILL_MSG    = "$MODULE.refill"
+        const val REFILL_MESSAGE= "$MODULE.refill"
 
         fun initialize(plugin: JavaPlugin) {
             if (getSettings().getConfig().getBoolean(ENABLED)) {

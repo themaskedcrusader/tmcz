@@ -40,8 +40,6 @@ import java.lang.ClassCastException
 
 class VisibilityListener(plugin: JavaPlugin) : VisibilityModule() {
 
-    private val zombieHead = MaskedItem("ZOMBIE_HEAD|1|0")
-
     init {
         if (getSettings().getConfig().getBoolean(MODULE + ENABLED)) {
             plugin.server.pluginManager.registerEvents(this, plugin)
@@ -54,66 +52,20 @@ class VisibilityListener(plugin: JavaPlugin) : VisibilityModule() {
             val hostile = event.entity
             val target = event.target
             if (target != null && target is Player && isAllowed(target)) {
-                if (hostile is Zombie && target.inventory.helmet!!.type == Material.ZOMBIE_HEAD) {
-                    // the zombies think you are one of them. incognito mode
+                val noiseLevel = target.exp
+                val distance = hostile.location.distance(target.location)
+                if (distance > 0      && distance < 4  && noiseLevel < (0.15)
+                    || (distance > 4  && distance < 7  && noiseLevel < (0.30))
+                    || (distance > 7  && distance < 10 && noiseLevel < (0.45))
+                    || (distance > 10 && distance < 12 && noiseLevel < (0.60))
+                    || (distance > 12 && distance < 15 && noiseLevel < (0.75))
+                    || (distance > 15 && noiseLevel < (0.90))
+                ) {
                     event.isCancelled = true
-                } else {
-                    val noiseLevel = target.exp
-                    val distance = hostile.location.distance(target.location)
-                    if (distance > 0      && distance < 4  && noiseLevel < (0.15)
-                        || (distance > 4  && distance < 7  && noiseLevel < (0.30))
-                        || (distance > 7  && distance < 10 && noiseLevel < (0.45))
-                        || (distance > 10 && distance < 12 && noiseLevel < (0.60))
-                        || (distance > 12 && distance < 15 && noiseLevel < (0.75))
-                        || (distance > 15 && noiseLevel < (0.90))
-                    ) {
-                        event.isCancelled = true
-                    }
                 }
             }
-        } catch (ignored: Exception) {
+        } catch (ignored: NullPointerException) {
             // Sometimes the event causes an NPE, let's just ignore those.
         }
     }
-
-    @EventHandler
-    fun getZombieHead(event: EntityDeathEvent) {
-        if (event.entity.type == EntityType.ZOMBIE) {
-            try {
-                val entityDeathCause: EntityDamageByEntityEvent =
-                    event.entity.lastDamageCause as EntityDamageByEntityEvent
-                if (entityDeathCause.damager is Player) {
-                    val chance = nextRandomIntBetween(1, 1000)
-                    if (chance == 417) { // TODO, make chance configurable?
-                        event.drops.add(zombieHead.unmask())
-                    }
-                }
-            } catch (ignored: ClassCastException) { }
-        }
-    }
-
-    @EventHandler
-    fun putZombieHeadOnOnLeftClick(event: PlayerInteractEvent) {
-        val player = event.player
-        val itemInMainHand = player.inventory.itemInMainHand
-        if (itemInMainHand.type == Material.ZOMBIE_HEAD && player.inventory.helmet == null ) {
-            itemInMainHand.amount--
-            event.player.inventory.helmet = zombieHead.unmask()
-            event.isCancelled = true
-        }
-    }
-
-    @EventHandler
-    fun wornZombieHeadRandomlyBreaks(event: EntityDamageEvent) {
-        if (event.entity is Player) {
-            val player = event.entity as Player
-            if (player.inventory.helmet != null && player.inventory.helmet!!.type == Material.ZOMBIE_HEAD) {
-                val chance = nextRandomIntBetween(1, 20) // 1 in 20 chance -
-                if (chance == 7) {
-                    player.inventory.helmet = null
-                }
-            }
-        }
-    }
-
 }

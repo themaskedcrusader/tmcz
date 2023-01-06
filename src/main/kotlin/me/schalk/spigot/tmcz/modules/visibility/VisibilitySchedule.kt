@@ -26,7 +26,10 @@ import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.lib.util.isPlayerFalling
 import me.schalk.spigot.lib.util.isPlayerMoving
 import me.schalk.spigot.tmcz.data.GameData
+import me.schalk.spigot.lib.util.isAllowed as isWorldAllowed
 import org.bukkit.Location
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -53,6 +56,14 @@ class VisibilitySchedule(plugin: JavaPlugin) : VisibilityModule() {
                     playerMovement[player.displayName] = player.location
                 }
             }
+        }
+
+        fun isAllowed(entity: Entity): Boolean {
+            val worldAllowed: Boolean = isWorldAllowed(entity.world, getSettings())
+            if (entity.type != EntityType.PLAYER) return false
+            if (getSettings().getConfig().getBoolean(SERVER_WIDE)) return true
+            return if (getSettings().getConfig().getBoolean(IN_GAME_ONLY))
+                GameData.getPlayer(entity as Player).playing && worldAllowed else worldAllowed
         }
 
         private fun calculateVisibility(player: Player): Float {
