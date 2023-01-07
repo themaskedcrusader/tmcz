@@ -39,13 +39,13 @@ import java.util.*
 class BlockListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val BLOCK_PROTECTION      = ".block-protection"
-        private const val _CAN_PLACE_BLOCKS     = MODULE + BLOCK_PROTECTION + ".place"
-        private const val _CAN_BREAK_BLOCKS     = MODULE + BLOCK_PROTECTION + ".break"
-        private const val _IN_GAME_ONLY         = MODULE + BLOCK_PROTECTION + IN_GAME
-        private const val _SERVER_WIDE          = MODULE + BLOCK_PROTECTION + SERVER_WIDE
-        private const val _CAN_OP_BUILD         = MODULE + BLOCK_PROTECTION + ".op-can-build"
-        private const val _ALLOWED_ITEMS_CONFIG = MODULE + BLOCK_PROTECTION + ".allowed-items"
+        private const val BLOCK_PROTECTION      = MODULE +".block-protection"
+        private const val _CAN_PLACE_BLOCKS     = BLOCK_PROTECTION + ".place"
+        private const val _CAN_BREAK_BLOCKS     = BLOCK_PROTECTION + ".break"
+        private const val _IN_GAME_ONLY         = BLOCK_PROTECTION + IN_GAME
+        private const val _SERVER_WIDE          = BLOCK_PROTECTION + SERVER_WIDE
+        private const val _CAN_OP_BUILD         = BLOCK_PROTECTION + ".op-can-build"
+        private const val _ALLOWED_ITEMS_CONFIG = BLOCK_PROTECTION + ".allowed-items"
 
         private val allowedItems = mutableMapOf<Material, BlockBean>()
         private val placedBlocks = mutableMapOf<Location, BlockBean>()

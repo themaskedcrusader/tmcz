@@ -34,11 +34,11 @@ import org.bukkit.plugin.java.JavaPlugin
 class MelonListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val MELON         = ".melon"
-        private const val _ENABLED      = MODULE + MELON + ENABLED
-        private const val _IN_GAME_ONLY = MODULE + MELON + IN_GAME
-        private const val _SERVER_WIDE  = MODULE + MELON + SERVER_WIDE
-        private const val _ALLOWED_TOOL = MODULE + MELON + TOOL_ID
+        private const val MELON         = MODULE + ".melon"
+        private const val _ENABLED      = MELON + ENABLED
+        private const val _IN_GAME_ONLY = MELON + IN_GAME
+        private const val _SERVER_WIDE  = MELON + SERVER_WIDE
+        private const val _ALLOWED_TOOL = MELON + TOOL_ID
     }
 
     init {

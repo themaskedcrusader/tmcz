@@ -49,6 +49,7 @@ abstract class ItemModule : Listener {
                 GrenadeListener(plugin)
                 MelonListener(plugin)
                 MushroomListener(plugin)
+                SugarListener(plugin)
                 plugin.logger.info("Registered custom item interactions!")
             }
         }

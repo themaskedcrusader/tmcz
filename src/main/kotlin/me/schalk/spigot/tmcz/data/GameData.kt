@@ -32,6 +32,10 @@ sealed class GameData {
         var infected = false
         var ointment = false
         var thirsty = false
+        var drugged_doses = 0
+        var drugged_cooldown = 0
+        var tolerance = false
+        var overdose = false
         var zombieKills = 0
             private set
         var playerKills = 0
@@ -51,20 +55,6 @@ sealed class GameData {
         fun addPlayerHeals() {
             playerHeals++
         }
-
-        fun _is(status: Status) : Boolean {
-            return when (status) {
-                Status.BLEEDING -> bleeding
-                Status.INFECTED -> infected
-                Status.BANDAGED -> bandaged
-                Status.OINTMENT -> ointment
-                Status.ANTIBIOTIC -> antibiotic
-            }
-        }
-    }
-
-    enum class Status {
-        BLEEDING, INFECTED, BANDAGED, OINTMENT, ANTIBIOTIC
     }
 
     companion object {

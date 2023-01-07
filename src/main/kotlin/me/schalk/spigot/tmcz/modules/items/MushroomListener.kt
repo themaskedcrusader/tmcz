@@ -38,13 +38,13 @@ import kotlin.ConcurrentModificationException
 class MushroomListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val MUSHROOM          = ".mushroom"
-        private const val _ENABLED          = MODULE + MUSHROOM + ENABLED
-        private const val _IN_GAME_ONLY     = MODULE + MUSHROOM + IN_GAME
-        private const val _SERVER_WIDE      = MODULE + MUSHROOM + SERVER_WIDE
-        private const val _ALLOWED_TOOL     = MODULE + MUSHROOM + TOOL_ID
-        private const val _CAN_RESPAWN      = MODULE + MUSHROOM + RESPAWN
-        private const val _RESPAWN_SECONDS  = MODULE + MUSHROOM + R_SECONDS
+        private const val MUSHROOM          = MODULE + ".mushroom"
+        private const val _ENABLED          = MUSHROOM + ENABLED
+        private const val _IN_GAME_ONLY     = MUSHROOM + IN_GAME
+        private const val _SERVER_WIDE      = MUSHROOM + SERVER_WIDE
+        private const val _ALLOWED_TOOL     = MUSHROOM + TOOL_ID
+        private const val _CAN_RESPAWN      = MUSHROOM + RESPAWN
+        private const val _RESPAWN_SECONDS  = MUSHROOM + R_SECONDS
 
         fun cleanUp() {
             BlockListener.brokenBlocks.forEach{ brokenBlock ->

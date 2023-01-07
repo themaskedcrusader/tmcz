@@ -60,7 +60,7 @@ autosave-system:      # This module runs for all players on the server. Single W
 # The Bleed System introduces gameplay where getting hurt by different types of damage causes you to bleed. Bleeding
 # can be stopped by applying a bandage. The player can bleed out and die if the bleeding is not stopped before they
 # lose all of their hearts. See below for configuration options.
-# TODO: Feature complete
+# TODO: Feature complete - NEED TO REWARD ANOTHRE PLAYER WHO HEALS YOU
 
 bleed-system:
   enabled: false         # If true: player bleeding system is activated
@@ -89,10 +89,6 @@ game-system:               ## The core TMCz Game Mechanics
   bandit-healer: 15        # The number of other player heals a bandit must make to lose their bandit tag
   healer-tag: true         # If true: a player who heals other players can be flagged as a healer
   healer-heals: 10         # The number of other player heals a player must make to earn the healer tag
-  sugar-speed:
-    enabled: true          # If true: eating sugar (right click with sugar) will give player a speed potion effect
-    duration: 10           # Seconds for speed potion effect to last
-    multiplier: 1          # Speed potion effect level to give (1 = Speed I, 10 = Speed X, etc)
   start-kit:
     enabled: true          # If true: player's inventory is cleared and they are given these items when game is started
     helmet:   leather_helmet|1|-1|41     # When someone enters the game, these armor items will be added to the player.
@@ -182,6 +178,18 @@ item-system:
     drop: true            # If true: broken cobwebs drop a place-able cobweb item
     respawn: true         # If true: broken cobwebs will re-spawn in their original location
     respawn-seconds: 300  # number of seconds before a cobweb will re-spawn after it is broken
+  sugar:
+    enabled: false        # If true: Sugar doping is enabled
+    only-in-game: true    # If true: players can only use sugar for speed while playing TMCz
+    server-wide: false    # If true: any player on the server can use sugar for speed, only-in-game property ignored.
+    duration: 10          # Seconds for speed potion effect to last
+    overdose: 5           # How many doses at once will kill the player
+    tolerance: 5          # How many individual doses does it take to build up a tolerance?
+    tolerance-effect: 75  # After building up a tolerance, how effective will each dose be in percentage points
+    tolerance-overdose: 7 # After building up a tolerance, how many doses at once will kill the player.
+    death-chance: 500     # Sugar has a 1 in x chance of killing the player immediately
+    side-effect: 250      # Sugar has a 1 in x chance of giving the player a random side effect while using
+    random-effect: 375    # Sugar has a 1 in x chance of giving the player a random latent side effect
   block-protection:
     place: true           # If true: players can place specified blocks, all other block placing is prohibited
     break: true           # If true: players can break specified blocks, all other block breaking is prohibited

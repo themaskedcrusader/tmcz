@@ -32,12 +32,12 @@ import org.bukkit.plugin.java.JavaPlugin
 class GrenadeListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val GRENADE         = ".end-grenade"
-        private const val _ENABLED        = MODULE + GRENADE + ENABLED
-        private const val _IN_GAME_ONLY   = MODULE + GRENADE + IN_GAME
-        private const val _SERVER_WIDE    = MODULE + GRENADE + SERVER_WIDE
-        private const val _PROTECT_WORLD  = MODULE + GRENADE + ".protect-world"
-        private const val _BLAST_RADIUS   = MODULE + GRENADE + ".radius"
+        private const val GRENADE         = MODULE +".end-grenade"
+        private const val _ENABLED        = GRENADE + ENABLED
+        private const val _IN_GAME_ONLY   = GRENADE + IN_GAME
+        private const val _SERVER_WIDE    = GRENADE + SERVER_WIDE
+        private const val _PROTECT_WORLD  = GRENADE + ".protect-world"
+        private const val _BLAST_RADIUS   = GRENADE + ".radius"
     }
 
     init {

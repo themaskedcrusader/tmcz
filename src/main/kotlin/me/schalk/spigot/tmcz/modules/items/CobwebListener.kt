@@ -37,14 +37,14 @@ import java.util.*
 class CobwebListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val COBWEB            = ".cobweb"
-        private const val _ENABLED          = MODULE + COBWEB + ENABLED
-        private const val _IN_GAME          = MODULE + COBWEB + IN_GAME
-        private const val _SERVER_WIDE      = MODULE + COBWEB + SERVER_WIDE
-        private const val _ALLOWED_TOOL     = MODULE + COBWEB + TOOL_ID
-        private const val _ALLOW_DROPS      = MODULE + COBWEB + ".drop"
-        private const val _ALLOW_RESPAWN    = MODULE + COBWEB + RESPAWN
-        private const val _RESPAWN_SECONDS  = MODULE + COBWEB + R_SECONDS
+        private const val COBWEB            = MODULE + ".cobweb"
+        private const val _ENABLED          = COBWEB + ENABLED
+        private const val _IN_GAME          = COBWEB + IN_GAME
+        private const val _SERVER_WIDE      = COBWEB + SERVER_WIDE
+        private const val _ALLOWED_TOOL     = COBWEB + TOOL_ID
+        private const val _ALLOW_DROPS      = COBWEB + ".drop"
+        private const val _ALLOW_RESPAWN    = COBWEB + RESPAWN
+        private const val _RESPAWN_SECONDS  = COBWEB + R_SECONDS
 
         fun cleanUp() {
             BlockListener.brokenBlocks.forEach { cobweb ->
