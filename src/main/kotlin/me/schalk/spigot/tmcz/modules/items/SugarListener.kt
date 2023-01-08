@@ -28,6 +28,7 @@ import me.schalk.spigot.lib.math.nextRandomIntBetween
 import me.schalk.spigot.tmcz.data.GameData
 import org.bukkit.ChatColor
 import org.bukkit.Material
+import org.bukkit.Particle
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.block.Action
@@ -49,6 +50,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
                 plugin, { processSugarCoolDown() }, 200, (duration * 100).toLong() )
             plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
                 { processSugarRandomEffect() }, 200, (duration * 100).toLong() )
+            plugin.server.logger.info("Sugar system online...")
         }
     }
 
@@ -60,12 +62,12 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
         private const val _DURATION             = SUGAR + ".duration"
         private const val _OVERDOSE             = SUGAR + ".overdose"
         private const val _TOLERANCE            = SUGAR + ".tolerance"
-        private const val _TOLERANCE_EFFECT     = SUGAR + ".tolerance-effect"
         private const val _TOLERANCE_OVERDOSE   = SUGAR + ".tolerance-overdose"
         private const val _DEATH_CHANCE         = SUGAR + ".death-chance"
         private const val _SIDE_EFFECT_CHANCE   = SUGAR + ".side-effect"
         private const val _LATENT_EFFECT_CHANCE = SUGAR + ".random-effect"
         private const val _DEATH_MESSAGE        = SUGAR + ".death"
+        private const val _DEATH_SIDE_EFFECT    = SUGAR + ".side-effect"
         private lateinit var plugin: JavaPlugin
 
         private val possibleSideEffects = listOf(
@@ -98,7 +100,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
                     val playerBean = GameData.getPlayer(player)
                     val latentSideEffectChance = nextRandomIntBetween(0, getSettings().getConfig().getInt(
                         _LATENT_EFFECT_CHANCE))
-                    if (playerBean.drugged_doses == latentSideEffectChance) {
+                    if (playerBean.drugged_doses > 0 && 1 == latentSideEffectChance) {
                         addSideEffect(player)
                     }
                 }
@@ -117,6 +119,10 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
             player.addPotionEffect(sideEffect)
             player.sendMessage(ChatColor.RED.toString() +
                     "Oof, I don't feel so good... is this a side effect of the sugar?")
+            val duration = getSettings().getConfig().getInt(_DURATION)
+            GameData.getPlayer(player).side_effect = true
+            plugin.server.scheduler.scheduleSyncDelayedTask(plugin,
+                { GameData.getPlayer(player).side_effect = false}, (duration * 20).toLong())
         }
     }
 
@@ -145,10 +151,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
     private fun applyPotionEffect(player: Player, playerBean: GameData.PlayerBean) {
         val potionEffect = PotionEffectType.SPEED
         val currentEffect = player.getPotionEffect(potionEffect)
-        var sugarDuration = getSettings().getConfig().getInt(_DURATION) * 20
-        if (playerBean.tolerance) {
-            sugarDuration = (sugarDuration.toDouble() * (1 / getSettings().getConfig().getDouble(_TOLERANCE_EFFECT))).toInt()
-        }
+        val sugarDuration = getSettings().getConfig().getInt(_DURATION) * 20
         if (currentEffect != null) {
             val newEffect = PotionEffect(potionEffect, currentEffect.duration + sugarDuration, 1, false, false, false)
             player.removePotionEffect(potionEffect)
@@ -161,7 +164,11 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
     }
 
     private fun showerPlayerWithParticles(player: Player) {
-        // TODO
+        player.spawnParticle(
+            Particle.SNOWFLAKE,
+            player.location.x, player.location.y.plus(1.75), player.location.z, 10,
+            0.05, 0.05, 0.05, 0.005
+        )
     }
 
     private fun calculateTolerance(playerBean: GameData.PlayerBean) {
@@ -172,15 +179,15 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
 
     private fun calculateChanceOfSideEffect(player: Player, playerBean: GameData.PlayerBean) {
         val chanceOfSideEffect = nextRandomIntBetween(0, getSettings().getConfig().getInt(_SIDE_EFFECT_CHANCE))
-        if (playerBean.drugged_doses == chanceOfSideEffect) {
+        if (playerBean.drugged_doses > 0 && 1 == chanceOfSideEffect) {
             addSideEffect(player)
         }
     }
 
     private fun calculateChanceOfDeath(player: Player, playerBean: GameData.PlayerBean) {
         val chanceOfInstantDeath = nextRandomIntBetween(0, getSettings().getConfig().getInt(_DEATH_CHANCE))
-        if (playerBean.drugged_doses == chanceOfInstantDeath) {
-            player.health = 0.0
+        if (playerBean.drugged_doses > 0 && 1 == chanceOfInstantDeath) {
+            player.damage(100.0)
             playerBean.overdose = true
         }
     }
@@ -191,7 +198,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
             overdose = getSettings().getConfig().getInt(_TOLERANCE_OVERDOSE)
         }
         if (playerBean.drugged_cooldown > overdose) {
-            player.health = 0.0
+            player.damage(100.0)
             playerBean.overdose = true
         }
     }
@@ -199,9 +206,13 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
     @EventHandler
     fun sugarDeath(event: PlayerDeathEvent) {
         if (isAllowed(event.entity, _SERVER_WIDE, _ONLY_IN_GAME)) {
+            println(event.entity.lastDamageCause?.cause)
             if (GameData.getPlayer(event.entity).overdose
                 && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM) {
                 event.deathMessage = getMessages().getConfig().getString(_DEATH_MESSAGE)
+                    ?.replace("__player", event.entity.displayName)
+            } else if (GameData.getPlayer(event.entity).side_effect) {
+                event.deathMessage = getMessages().getConfig().getString(_DEATH_SIDE_EFFECT)
                     ?.replace("__player", event.entity.displayName)
             }
             val playerBean = GameData.getPlayer(event.entity)

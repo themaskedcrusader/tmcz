@@ -36,6 +36,7 @@ sealed class GameData {
         var drugged_cooldown = 0
         var tolerance = false
         var overdose = false
+        var side_effect = false
         var zombieKills = 0
             private set
         var playerKills = 0

@@ -183,9 +183,8 @@ item-system:
     only-in-game: true    # If true: players can only use sugar for speed while playing TMCz
     server-wide: false    # If true: any player on the server can use sugar for speed, only-in-game property ignored.
     duration: 10          # Seconds for speed potion effect to last
-    overdose: 5           # How many doses at once will kill the player
+    overdose: 4           # How many doses at once will kill the player
     tolerance: 5          # How many individual doses does it take to build up a tolerance?
-    tolerance-effect: 75  # After building up a tolerance, how effective will each dose be in percentage points
     tolerance-overdose: 7 # After building up a tolerance, how many doses at once will kill the player.
     death-chance: 500     # Sugar has a 1 in x chance of killing the player immediately
     side-effect: 250      # Sugar has a 1 in x chance of giving the player a random side effect while using

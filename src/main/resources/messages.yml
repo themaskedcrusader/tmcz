@@ -21,6 +21,11 @@ infection-system:
   healer-cure:
   healed-cure:
 
+item-system:
+  sugar:
+    death: __player hit the powder a little too heavily and overdosed
+    side-effect: __player had a bad reaction to a side effect of the sugar
+
 game-system:
   welcome-message: Welcome to the game!
   kill-stats: Your current Kills - __zombie zombies | __player players
