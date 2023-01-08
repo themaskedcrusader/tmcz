@@ -22,26 +22,15 @@
 
 package me.schalk.spigot.tmcz.modules.visibility
 
-import me.schalk.spigot.lib.config.getSettings
-import me.schalk.spigot.lib.math.nextRandomIntBetween
-import me.schalk.spigot.lib.model.MaskedItem
-import org.bukkit.Material
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import org.bukkit.entity.Zombie
 import org.bukkit.event.EventHandler
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.EntityTargetLivingEntityEvent
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.plugin.java.JavaPlugin
-import java.lang.ClassCastException
 
 class VisibilityListener(plugin: JavaPlugin) : VisibilityModule() {
 
     init {
-        if (getSettings().getConfig().getBoolean(MODULE + ENABLED)) {
+        if (ENABLED) {
             plugin.server.pluginManager.registerEvents(this, plugin)
         }
     }

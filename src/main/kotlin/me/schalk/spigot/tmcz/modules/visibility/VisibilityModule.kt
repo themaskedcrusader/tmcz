@@ -35,15 +35,15 @@ import org.bukkit.plugin.java.JavaPlugin
 abstract class VisibilityModule : Listener {
 
     companion object {
-        const val MODULE        = "visibility-system"
-        const val ENABLED       = ".enabled"
-        const val IN_GAME_ONLY  = ".only-in-game"
-        const val SERVER_WIDE   = ".server-wide"
-        const val TICKS         = ".ticks"
+        const val MODULE  = "visibility-system"
+        val ENABLED       = getSettings().getConfig().getBoolean(MODULE + ".enabled")
+        val IN_GAME_ONLY  = getSettings().getConfig().getBoolean(MODULE + ".only-in-game")
+        val SERVER_WIDE   = getSettings().getConfig().getBoolean(MODULE + ".server-wide")
+        val TICKS         = getSettings().getConfig().getLong(MODULE + ".ticks")
 
         fun initialize(plugin: JavaPlugin) {
             if (isSingleWorld(getSettings())) {
-                if (getSettings().getConfig().getBoolean(MODULE + ENABLED)) {
+                if (ENABLED) {
                     VisibilitySchedule(plugin)
                     VisibilityListener(plugin);
                     plugin.logger.info("Visibility System Online!");
@@ -56,9 +56,8 @@ abstract class VisibilityModule : Listener {
         fun isAllowed(entity: Entity): Boolean {
             val worldAllowed: Boolean = isWorldAllowed(entity.world, getSettings())
             if (entity.type != EntityType.PLAYER) return false
-            if (getSettings().getConfig().getBoolean(MODULE + SERVER_WIDE)) return true
-            return if (getSettings().getConfig().getBoolean(MODULE + IN_GAME_ONLY))
-                GameData.getPlayer(entity as Player).playing && worldAllowed else worldAllowed
+            if (SERVER_WIDE) return true
+            return if (IN_GAME_ONLY) GameData.getPlayer(entity as Player).playing && worldAllowed else worldAllowed
         }
     }
 }
