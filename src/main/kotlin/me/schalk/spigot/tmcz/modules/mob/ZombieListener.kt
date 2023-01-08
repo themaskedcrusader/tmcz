@@ -35,23 +35,28 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.entity.*
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.plugin.java.JavaPlugin
-import java.lang.ClassCastException
 
 class ZombieListener(val plugin: JavaPlugin) : MobModule() {
 
-    private val zombieHead = MaskedItem("ZOMBIE_HEAD|1|0")
-    private val _canZombiesBurn     = MODULE + ZOMBIE + ".can-burn"
-    private val _headHidesPlayer    = MODULE + ZOMBIE + ".head-hides"
-    private val _headDropChance     = MODULE + ZOMBIE + ".head-drop-chance"
-    private val _headBreakChance    = MODULE + ZOMBIE + ".head-break-chance"
+    companion object {
+        private val zombieHead = MaskedItem("ZOMBIE_HEAD|1|0")
+        private val ZOMBIE = ".zombie"
+        private val ENABLED = getSettings().getConfig().getBoolean(MODULE + ZOMBIE + ".enabled")
+        private val CAN_BURN = getSettings().getConfig().getBoolean(MODULE + ZOMBIE + ".can-burn")
+        private val HEAD_HIDES_PLAYER = getSettings().getConfig().getBoolean(MODULE + ZOMBIE + ".head-hides")
+        private val HEAD_DROP_CHANCE = getSettings().getConfig().getInt(MODULE + ZOMBIE + ".head-drop-chance")
+        private val HEAD_BREAK_CHANCE = getSettings().getConfig().getInt(MODULE + ZOMBIE + ".head-break-chance")
+    }
 
     init{
-        plugin.server.pluginManager.registerEvents(this, plugin)
+        if (ENABLED) {
+            plugin.server.pluginManager.registerEvents(this, plugin)
+        }
     }
 
     @EventHandler
     fun cancelZombieFire(event: EntityCombustEvent) {
-        if (getSettings().getConfig().getBoolean(_canZombiesBurn)) {
+        if (!CAN_BURN) {
             event.isCancelled = event.entityType == EntityType.ZOMBIE
         }
     }
@@ -68,23 +73,18 @@ class ZombieListener(val plugin: JavaPlugin) : MobModule() {
 
     @EventHandler
     fun getZombieHead(event: EntityDeathEvent) {
-        if (event.entity.type == EntityType.ZOMBIE) {
-            try {
-                val entityDeathCause: EntityDamageByEntityEvent =
-                    event.entity.lastDamageCause as EntityDamageByEntityEvent
-                if (entityDeathCause.damager is Player) {
-                    val configuredChance = getSettings().getConfig().getInt(_headDropChance)
-                    val chance = nextRandomIntBetween(0, configuredChance)
-                    if (chance == 1) {
-                        event.drops.add(zombieHead.unmask())
-                    }
+        if (event.entity.type == EntityType.ZOMBIE && event.entity.lastDamageCause is EntityDamageByEntityEvent) {
+            val entityDeathCause = event.entity.lastDamageCause as EntityDamageByEntityEvent
+            if (entityDeathCause.damager is Player) {
+                if (1 == nextRandomIntBetween(0, HEAD_DROP_CHANCE)) {
+                    event.drops.add(zombieHead.unmask())
                 }
-            } catch (ignored: ClassCastException) { }
+            }
         }
     }
 
     @EventHandler
-    fun putZombieHeadOnOnLeftClick(event: PlayerInteractEvent) {
+    fun putOnZombieHead(event: PlayerInteractEvent) {
         val player = event.player
         val itemInMainHand = player.inventory.itemInMainHand
         if (itemInMainHand.type == Material.ZOMBIE_HEAD && player.inventory.helmet == null ) {
@@ -99,9 +99,7 @@ class ZombieListener(val plugin: JavaPlugin) : MobModule() {
         if (event.entity is Player) {
             val player = event.entity as Player
             if (player.inventory.helmet != null && player.inventory.helmet!!.type == Material.ZOMBIE_HEAD) {
-                val configuredChance = getSettings().getConfig().getInt(_headBreakChance)
-                val chance = nextRandomIntBetween(0, configuredChance)
-                if (chance == 1) {
+                if (1 == nextRandomIntBetween(0, HEAD_BREAK_CHANCE)) {
                     player.inventory.helmet = null
                     player.playSound(player.location, Sound.ENTITY_GOAT_HORN_BREAK, 1.0f, 1.0f)
                     player.spawnParticle(Particle.CLOUD, player.location.x, player.location.y + 2, player.location.z,
@@ -113,11 +111,10 @@ class ZombieListener(val plugin: JavaPlugin) : MobModule() {
 
     @EventHandler
     fun zombieHeadHides(event: EntityTargetLivingEntityEvent) {
-        if (getSettings().getConfig().getBoolean(_headHidesPlayer)) {
+        if (HEAD_HIDES_PLAYER) {
             val hostile = event.entity
             val target = event.target
             if (hostile is Zombie && target is Player && target.inventory.helmet!!.type == Material.ZOMBIE_HEAD) {
-                // the zombies think you are one of them. incognito mode
                 event.isCancelled = true
             }
         }

@@ -22,23 +22,19 @@
 
 package me.schalk.spigot.tmcz.modules.mob
 
-import me.schalk.spigot.lib.config.getSettings
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
 abstract class MobModule : Listener {
+
     companion object {
         lateinit var plugin: JavaPlugin
 
-        const val MODULE  = "mob-controls"
-        const val ENABLED = ".enabled"
-        const val ZOMBIE = ".zombie"
+        const val MODULE    = "mob-controls"
 
         fun initialize(plugin: JavaPlugin) {
             MobModule.plugin = plugin
-            if (!getSettings().getConfig().getBoolean(MODULE + ZOMBIE + ENABLED)) {
-                ZombieListener(plugin)
-            }
+            ZombieListener(plugin)
         }
     }
 }
