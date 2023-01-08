@@ -22,11 +22,8 @@
 
 package me.schalk.spigot.tmcz.modules.thirst
 
-import me.schalk.spigot.lib.config.getMessages
-import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.lib.math.nextRandomIntBetween
 import me.schalk.spigot.tmcz.data.GameData
-import me.schalk.spigot.tmcz.modules.bleed.BleedModule
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -35,6 +32,7 @@ import org.bukkit.event.entity.EntityDeathEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerItemConsumeEvent
 import org.bukkit.event.player.PlayerRespawnEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.potion.PotionEffectType
@@ -50,10 +48,7 @@ class ThirstListener(val plugin: JavaPlugin) : ThirstModule() {
     fun setThirstLevelOnSpawn(event: PlayerRespawnEvent) {
         val player = event.player
         if (isAllowed(player)) {
-            plugin.server.scheduler.scheduleSyncDelayedTask(
-                plugin,{ player.level = getSettings().getConfig().getInt(START) }, 5L
-            )
-            player.removePotionEffect(PotionEffectType.CONFUSION)
+            player.level = START
             GameData.getPlayer(player).thirsty = false
         }
     }
@@ -61,19 +56,28 @@ class ThirstListener(val plugin: JavaPlugin) : ThirstModule() {
     @EventHandler
     fun playerDrinkEvent(event: PlayerItemConsumeEvent) {
         if (isAllowed(event.player) && event.item.type == Material.POTION) {
-            var restored = getSettings().getConfig().getInt(REFILL_POTION)
-            if ((event.item.itemMeta as PotionMeta).basePotionData.type == PotionType.WATER) {
-                restored = getSettings().getConfig().getInt(REFILL_WATER)
-            }
-            event.player.level = (event.player.level + restored).coerceAtMost(getSettings().getConfig().getInt(FULL))
-            event.player.removePotionEffect(PotionEffectType.CONFUSION)
-            GameData.getPlayer(event.player).thirsty = false
-            val breakChance = nextRandomIntBetween(0, 100)
-            if (getSettings().getConfig().getInt(BREAK_CHANCE) > breakChance) {
-                val item = event.player.inventory.itemInMainHand
-                event.player.inventory.remove(item)
-            }
-            event.player.sendMessage(getMessages().getConfig().getString(REFILL_MESSAGE))
+            quenchThatThirst(event.player, event.item)
+            chanceOfBrokenBottle(event.player)
+        }
+    }
+
+    private fun quenchThatThirst(player: Player, potion: ItemStack) {
+        GameData.getPlayer(player).thirsty = false
+        var restored = REFILL_POTION
+        if ((potion.itemMeta as PotionMeta).basePotionData.type == PotionType.WATER) {
+            restored = REFILL_WATER
+        }
+        player.level = (player.level + restored).coerceAtMost(FULL)
+        player.removePotionEffect(PotionEffectType.CONFUSION)
+        player.sendMessage(REFILL_MESSAGE)
+    }
+
+    private fun chanceOfBrokenBottle(player: Player) {
+        val breakChance = nextRandomIntBetween(0, 100)
+        if (BREAK_CHANCE > breakChance) {
+            player.sendMessage("Dang, my bottle broke")
+            val item = player.inventory.itemInMainHand
+            player.inventory.remove(item)
         }
     }
 
@@ -85,13 +89,14 @@ class ThirstListener(val plugin: JavaPlugin) : ThirstModule() {
     }
 
     @EventHandler
-    fun thirstDeathMessageOnPlayerDeath(event: PlayerDeathEvent) {
-        if (isAllowed(event.entity)) {
-            if (GameData.getPlayer(event.entity).thirsty && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM) {
-                event.deathMessage = getMessages().getConfig().getString(DEATH_MESSAGE)
-                    ?.replace("__player", event.entity.displayName)
-                }
-            GameData.getPlayer(event.entity).thirsty = false
+    fun handleThirstyDeath(event: PlayerDeathEvent) {
+        if (isAllowed(event.entity)
+            && GameData.getPlayer(event.entity).thirsty
+            && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM)
+        {
+            event.deathMessage = DEATH_MESSAGE?.replace("__player", event.entity.displayName)
         }
+        event.entity.removePotionEffect(PotionEffectType.CONFUSION)
+        GameData.getPlayer(event.entity).thirsty = false
     }
 }

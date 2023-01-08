@@ -22,7 +22,6 @@
 
 package me.schalk.spigot.tmcz.modules.thirst
 
-import me.schalk.spigot.lib.config.getMessages
 import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.lib.serializer.abovePlayerHead
 import me.schalk.spigot.tmcz.data.GameData
@@ -37,16 +36,8 @@ class ThirstSchedule(plugin: JavaPlugin) : ThirstModule() {
     
     init{
         ThirstSchedule.plugin = plugin
-        
-        // Schedule to calculate thirst
-        plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
-            { calculateThirst() }, 20L, getSettings().getConfig().getLong(TICKS)
-        )
-
-        // Schedule to damage due to thirst
-        plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
-            { calculateThirstDamage() }, 20L, getSettings().getConfig().getLong(DAMAGE_TICKS)
-        )
+        plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { calculateThirst() }, 20L, TICKS )
+        plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { calculateThirstDamage() }, 20L, DAMAGE_TICKS)
     }
 
     companion object {
@@ -69,8 +60,8 @@ class ThirstSchedule(plugin: JavaPlugin) : ThirstModule() {
             plugin.server.onlinePlayers.forEach{ player ->
                 if (isAllowed(player) && player.level == 0) {
                     GameData.getPlayer(player).thirsty = true
-                    if (!player.isOp || !getSettings().getConfig().getBoolean("world.op-is-god")) {
-                        player.damage(getSettings().getConfig().getInt(DAMAGE_HIT).toDouble())
+                    if (!player.isOp || !getSettings().getConfig().getBoolean("world.op-is-god")) { // TODO move to world config
+                        player.damage(DAMAGE_HIT)
                         val location = abovePlayerHead(player.location)
                         player.spawnParticle(Particle.BUBBLE_POP, location.x, location.y, location.z, 3, 0.3, 0.3, 0.3, 0.01)
                     }
@@ -84,20 +75,12 @@ class ThirstSchedule(plugin: JavaPlugin) : ThirstModule() {
         }
 
         private fun sendPlayerThirstMessage(player: Player) {
-            val message = ChatColor.YELLOW.toString()
+            val yellow = ChatColor.YELLOW.toString()
             when (player.level) {
-                getSettings().getConfig().getInt(PARCH_1) -> {
-                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_1_MSG))
-                }
-                getSettings().getConfig().getInt(PARCH_2) -> {
-                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_2_MSG))
-                }
-                getSettings().getConfig().getInt(PARCH_3) -> {
-                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_3_MSG))
-                }
-                getSettings().getConfig().getInt(PARCH_4) -> {
-                    player.sendMessage(message + getMessages().getConfig().getString(PARCH_4_MSG))
-                }
+                PARCH_1 -> { player.sendMessage(yellow + PARCH_1_MSG) }
+                PARCH_2 -> { player.sendMessage(yellow + PARCH_2_MSG) }
+                PARCH_3 -> { player.sendMessage(yellow + PARCH_3_MSG) }
+                PARCH_4 -> { player.sendMessage(yellow + PARCH_4_MSG) }
             }
         }
     }
