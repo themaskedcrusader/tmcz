@@ -22,11 +22,8 @@
 
 package me.schalk.spigot.tmcz.modules.bleed
 
-import me.schalk.spigot.lib.config.getMessages
-import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.lib.math.getChancePercentage
 import me.schalk.spigot.tmcz.data.GameData
-import me.schalk.spigot.tmcz.modules.bleed.BleedSchedule.Companion.plugin
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.Material
@@ -46,6 +43,18 @@ import org.bukkit.potion.PotionEffectType
 
 class BleedListener(val plugin: JavaPlugin) : BleedModule() {
 
+    private val bandageRegen = PotionEffect(PotionEffectType.REGENERATION, 80, 2, false, false, false)
+    private val healerReward = PotionEffect(PotionEffectType.ABSORPTION, 400, 0, false, false, false)
+
+    private val bleedingCauses = listOf(
+        EntityDamageEvent.DamageCause.ENTITY_ATTACK,
+        EntityDamageEvent.DamageCause.ENTITY_EXPLOSION,
+        EntityDamageEvent.DamageCause.FALL,
+        EntityDamageEvent.DamageCause.FIRE_TICK,
+        EntityDamageEvent.DamageCause.PROJECTILE,
+        EntityDamageEvent.DamageCause.CONTACT,
+    )
+
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
     }
@@ -54,18 +63,10 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
     fun bleedPlayer(event: EntityDamageEvent) {
         if (isAllowed(event.entity)) {
             val player = event.entity as Player
-            val chanceConfiguration: Int = getSettings().getConfig().getInt(MODULE + CHANCE)
-            val chanceCalculation = getChancePercentage()
-            if (chanceConfiguration >= chanceCalculation && !GameData.getPlayer(event.entity as Player).bleeding) {
-                if (event.cause == EntityDamageEvent.DamageCause.ENTITY_ATTACK
-                    || event.cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION
-                    || event.cause == EntityDamageEvent.DamageCause.FALL
-                    || event.cause == EntityDamageEvent.DamageCause.FIRE_TICK
-                    || event.cause == EntityDamageEvent.DamageCause.PROJECTILE
-                    || event.cause == EntityDamageEvent.DamageCause.CONTACT)
-                {
-                    player.sendMessage(ChatColor.RED.toString() + getMessages().getConfig().getString(MODULE + HIT_MSG))
-                    player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, getSettings().getConfig().getInt(MODULE + PARTICLES), 0.2, 0.2, 0.2, 0.01)
+            if (!GameData.getPlayer(event.entity as Player).bleeding && getChancePercentage() >= CHANCE_TO_BLEED) {
+                if (event.cause in bleedingCauses) {
+                    player.sendMessage(ChatColor.RED.toString() + HIT_MSG)
+                    player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, PARTICLES, 0.2, 0.2, 0.2, 0.01)
                     GameData.getPlayer(event.entity as Player).bleeding = true
                 }
             }
@@ -75,10 +76,8 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
     @EventHandler(priority = EventPriority.HIGH)
     fun stopBleedingUponDeath(event: PlayerDeathEvent) {
         if (isAllowed(event.entity)) {
-            if (GameData.getPlayer(event.entity).bleeding && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM) {
-                event.deathMessage = getMessages().getConfig().getString(MODULE + DEATH_MESSAGE)
-                    ?.replace("__player", event.entity.displayName)
-            }
+            if (GameData.getPlayer(event.entity).bleeding && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM)
+                event.deathMessage = DEATH_MESSAGE?.replace("__player", event.entity.displayName)
             GameData.getPlayer(event.entity).bleeding = false
         }
     }
@@ -106,12 +105,14 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
                 if (healed != null) {
                     if (GameData.getPlayer(healed).bleeding) {
                         GameData.getPlayer(healed).bleeding = false
+                        healed.sendMessage(ChatColor.GREEN.toString() + HEALED_MESSAGE?.replace("__healer", healerName))
+                        healed.addPotionEffect(bandageRegen)
+
                         healer.inventory.itemInMainHand.amount--
-                        healer.sendMessage(ChatColor.GREEN.toString() + getMessages().getConfig().getString(MODULE + HEALER_MESSAGE)
-                            ?.replace("__healed", healedName))
-                        healed.sendMessage(ChatColor.GREEN.toString() + getMessages().getConfig().getString(MODULE + HEALED_MESSAGE)
-                            ?.replace("__healer", healerName)
-                        )
+                        healer.sendMessage(ChatColor.GREEN.toString() + HEALER_MESSAGE?.replace("__healed", healedName))
+                        healer.addPotionEffect(healerReward)
+                        healer.addPotionEffect(bandageRegen)
+                        GameData.getPlayer(healer).addPlayerHeals()
                     }
                 }
             }
@@ -121,14 +122,13 @@ class BleedListener(val plugin: JavaPlugin) : BleedModule() {
     private fun useBandage(player: Player) {
         if (GameData.getPlayer(player).bleeding) {
             GameData.getPlayer(player).bleeding = false
-            val regen = PotionEffect(PotionEffectType.REGENERATION, 4, 2)
-            player.addPotionEffect(regen)
+            player.addPotionEffect(bandageRegen)
             if (player.inventory.itemInMainHand.amount > 1) {
                 player.inventory.itemInMainHand.amount--
             } else {
                 player.inventory.itemInMainHand.type = Material.AIR
             }
-            player.sendMessage(ChatColor.GREEN.toString() + getMessages().getConfig().getString(MODULE + SELF_STOP))
+            player.sendMessage(ChatColor.GREEN.toString() + SELF_STOP)
         }
     }
 }

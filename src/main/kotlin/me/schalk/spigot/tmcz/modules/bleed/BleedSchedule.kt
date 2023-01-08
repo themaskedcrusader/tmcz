@@ -34,10 +34,7 @@ class BleedSchedule(plugin: JavaPlugin) : BleedModule() {
 
     init{
         BleedSchedule.plugin = plugin
-        plugin.server.scheduler.runTaskTimerAsynchronously(
-            plugin,
-            Runnable { bleedThePlayer() }, 20L, getSettings().getConfig().getLong(MODULE + TICKS)
-        )
+        plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { bleedThePlayer() }, 20L, TICKS)
     }
 
     companion object {
@@ -46,12 +43,10 @@ class BleedSchedule(plugin: JavaPlugin) : BleedModule() {
         fun bleedThePlayer() {
             plugin.server.onlinePlayers.forEach{ player ->
                 if (isAllowed(player) && GameData.getPlayer(player).bleeding) {
-                    if (!player.isOp || !getSettings().getConfig().getBoolean("world.op-is-god")) {
-                        plugin.server.scheduler.runTaskLater(plugin, Runnable {
-                            player.damage(getSettings().getConfig().getDouble(MODULE + DAMAGE))
-                            player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, getSettings().getConfig().getInt(MODULE + PARTICLES),  0.2, 0.2, 0.2, 0.01)
-                                                                              }, 10)
-                        player.sendMessage(ChatColor.RED.toString() + getMessages().getConfig().getString(MODULE + MESSAGE))
+                    if (!player.isOp || !getSettings().getConfig().getBoolean("world.op-is-god")) { // TODO: move settings to WORLD object
+                        player.damage(DAMAGE)
+                        player.spawnParticle(Particle.DAMAGE_INDICATOR, player.location, PARTICLES,  0.2, 0.2, 0.2, 0.01)
+                        player.sendMessage(ChatColor.RED.toString() + MESSAGE)
                     }
                 }
             }

@@ -22,6 +22,7 @@
 
 package me.schalk.spigot.tmcz.modules.bleed
 
+import me.schalk.spigot.lib.config.getMessages
 import me.schalk.spigot.lib.config.getSettings
 import me.schalk.spigot.tmcz.data.GameData
 import org.bukkit.Material
@@ -37,28 +38,28 @@ abstract class BleedModule : Listener {
 
     companion object {
         // constants for the Bleed System
-        const val MODULE            = "bleed-system"
-        const val ENABLED           = ".enabled"
-        const val IN_GAME           = ".only-in-game"
-        const val SERVER_WIDE       = ".server-wide"
-        const val PARTICLES         = ".particles"
-        const val CHANCE            = ".chance"
-        const val DAMAGE            = ".damage"
-        const val TICKS             = ".ticks"
-        const val APPROVED_ITEM     = ".healer-item"
-        lateinit var BANDAGE        : Material
+        const val MODULE    = "bleed-system"
+        val ENABLED         = getSettings().getConfig().getBoolean(MODULE + ".enabled")
+        val IN_GAME         = getSettings().getConfig().getBoolean(MODULE + ".only-in-game")
+        val SERVER_WIDE     = getSettings().getConfig().getBoolean(MODULE + ".server-wide")
+        val PARTICLES       = getSettings().getConfig().getInt(MODULE + ".particles")
+        val CHANCE_TO_BLEED = getSettings().getConfig().getInt(MODULE + ".chance")
+        val DAMAGE          = getSettings().getConfig().getDouble(MODULE + ".damage")
+        val TICKS           = getSettings().getConfig().getLong(MODULE + ".ticks")
+        val APPROVED_ITEM   = getSettings().getConfig().getString( MODULE + ".healer-item")
+        lateinit var BANDAGE: Material
 
         // message keys for Bleed System
-        const val MESSAGE           = ".message"
-        const val HIT_MSG           = ".hit"
-        const val SELF_STOP         = ".stop-own"
-        const val DEATH_MESSAGE     = ".death-message"
-        const val HEALER_MESSAGE    = ".healer-stop"
-        const val HEALED_MESSAGE    = ".healed-stop"
+        val MESSAGE         = getMessages().getConfig().getString(MODULE + ".message")
+        val HIT_MSG         = getMessages().getConfig().getString(MODULE + ".hit")
+        val SELF_STOP       = getMessages().getConfig().getString(MODULE + ".stop-own")
+        val DEATH_MESSAGE   = getMessages().getConfig().getString(MODULE + ".death-message")
+        val HEALER_MESSAGE  = getMessages().getConfig().getString(MODULE + ".healer-stop")
+        val HEALED_MESSAGE  = getMessages().getConfig().getString(MODULE + ".healed-stop")
 
         fun initialize(plugin: JavaPlugin) {
-            if (getSettings().getConfig().getBoolean(MODULE + ENABLED)) {
-                val configuredBandage = Material.getMaterial(getSettings().getConfig().getString(MODULE + APPROVED_ITEM)!!.uppercase())
+            if (ENABLED) {
+                val configuredBandage = Material.getMaterial(APPROVED_ITEM!!.uppercase())
                 if (configuredBandage == null) {
                     plugin.logger.log(Level.SEVERE, "Approved bandage not a valid Minecraft Material")
                 } else {
@@ -72,16 +73,9 @@ abstract class BleedModule : Listener {
 
         fun isAllowed(entity: Entity): Boolean {
             if (entity.type != EntityType.PLAYER) return false
-            if (getSettings().getConfig().getBoolean(MODULE + SERVER_WIDE)) return true
-            val worldAllowed: Boolean = isWorldAllowed(entity.world, getSettings())
-            if (getSettings().getConfig().getBoolean(MODULE + IN_GAME)) {
-                if (GameData.getPlayer(entity as Player).playing) {
-                    return worldAllowed
-                }
-            } else {
-                return worldAllowed
-            }
-            return false
+            if (SERVER_WIDE) return true
+            val worldAllowed = isWorldAllowed(entity.world, getSettings())
+            return if (IN_GAME && GameData.getPlayer(entity as Player).playing) worldAllowed else worldAllowed
         }
     }
 }
