@@ -32,16 +32,16 @@ import org.bukkit.plugin.java.JavaPlugin
 class GrenadeListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val GRENADE         = MODULE +".end-grenade"
-        private const val _ENABLED        = GRENADE + ENABLED
-        private const val _IN_GAME_ONLY   = GRENADE + IN_GAME
-        private const val _SERVER_WIDE    = GRENADE + SERVER_WIDE
-        private const val _PROTECT_WORLD  = GRENADE + ".protect-world"
-        private const val _BLAST_RADIUS   = GRENADE + ".radius"
+        private const val GRENADE       = MODULE +".end-grenade"
+        private val IS_ENABLED          = getSettings().getConfig().getBoolean(GRENADE + ENABLED)
+        private val IS_IN_GAME_ONLY     = getSettings().getConfig().getBoolean(GRENADE + IN_GAME_ONLY)
+        private val IS_SERVER_WIDE      = getSettings().getConfig().getBoolean(GRENADE + SERVER_WIDE)
+        private val IS_PROTECT_WORLD    = getSettings().getConfig().getBoolean(GRENADE + ".protect-world")
+        private val BLAST_RADIUS        = getSettings().getConfig().getInt(GRENADE + ".radius")
     }
 
     init {
-        if (getSettings().getConfig().getBoolean(_ENABLED)) {
+        if (IS_ENABLED) {
             plugin.server.pluginManager.registerEvents(this, plugin)
         }
     }
@@ -51,13 +51,13 @@ class GrenadeListener(plugin: JavaPlugin) : ItemModule() {
         if (allowGrenade(event.player, event.cause)) {
             event.isCancelled = true
             val toExplode = event.to
-            val isWorldProtected = getSettings().getConfig().getBoolean(_PROTECT_WORLD)
-            toExplode!!.world!!.createExplosion(toExplode, getSettings().getConfig().getDouble(_BLAST_RADIUS).toFloat(),
-                !isWorldProtected, !isWorldProtected)
+            if (toExplode != null) {
+                toExplode.world?.createExplosion(toExplode, BLAST_RADIUS.toFloat(), !IS_PROTECT_WORLD, !IS_PROTECT_WORLD)
+            }
         }
     }
 
     private fun allowGrenade(player: Player, cause: TeleportCause): Boolean {
-        return isAllowed(player, _SERVER_WIDE, _IN_GAME_ONLY) && cause == TeleportCause.ENDER_PEARL
+        return isAllowed(player, IS_SERVER_WIDE, IS_IN_GAME_ONLY) && cause == TeleportCause.ENDER_PEARL
     }
 }

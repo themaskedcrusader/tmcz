@@ -37,14 +37,14 @@ import java.util.*
 class CobwebListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val COBWEB            = MODULE + ".cobweb"
-        private const val _ENABLED          = COBWEB + ENABLED
-        private const val _IN_GAME          = COBWEB + IN_GAME
-        private const val _SERVER_WIDE      = COBWEB + SERVER_WIDE
-        private const val _ALLOWED_TOOL     = COBWEB + TOOL_ID
-        private const val _ALLOW_DROPS      = COBWEB + ".drop"
-        private const val _ALLOW_RESPAWN    = COBWEB + RESPAWN
-        private const val _RESPAWN_SECONDS  = COBWEB + R_SECONDS
+        private const val COBWEB      = MODULE + ".cobweb"
+        private val IS_ENABLED        = getSettings().getConfig().getBoolean(COBWEB + ENABLED)
+        private val IS_IN_GAME_ONLY   = getSettings().getConfig().getBoolean(COBWEB + IN_GAME_ONLY)
+        private val IS_SERVER_WIDE    = getSettings().getConfig().getBoolean(COBWEB + SERVER_WIDE)
+        private val ALLOWED_TOOL      = getSettings().getConfig().getString(COBWEB + TOOL_ID)
+        private val ALLOW_DROPS       = getSettings().getConfig().getBoolean(COBWEB + ".drop")
+        private val ALLOW_RESPAWN     = getSettings().getConfig().getBoolean(COBWEB + RESPAWN)
+        private val RESPAWN_SECONDS   = getSettings().getConfig().getLong(COBWEB + R_SECONDS)
 
         fun cleanUp() {
             BlockListener.brokenBlocks.forEach { cobweb ->
@@ -52,8 +52,11 @@ class CobwebListener(plugin: JavaPlugin) : ItemModule() {
                 val block = cobweb.value
                 val now = Date().time
                 if (block.material == Material.COBWEB
-                    && (now - block.date.time) > getSettings().getConfig().getLong(_RESPAWN_SECONDS).times(1000)) {
-                    location.world!!.getBlockAt(location).type = Material.COBWEB
+                    && (now - block.date.time) > RESPAWN_SECONDS.times(1000)) {
+                    val world = location.world
+                    if (world != null) {
+                        world.getBlockAt(location).type = Material.COBWEB
+                    }
                     BlockListener.brokenBlocks.remove(location)
                 }
             }
@@ -61,13 +64,10 @@ class CobwebListener(plugin: JavaPlugin) : ItemModule() {
     }
 
     init {
-        if (getSettings().getConfig().getBoolean(_ENABLED)) {
+        if (IS_ENABLED) {
             plugin.server.pluginManager.registerEvents(this, plugin)
-            if (getSettings().getConfig().getBoolean(_ALLOW_RESPAWN)) {
-                plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
-                    { cleanUp() }, 15L, getSettings().getConfig().getLong(_RESPAWN_SECONDS) * 20L
-                )
-            }
+            if (ALLOW_RESPAWN)
+                plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { cleanUp() }, 15L, RESPAWN_SECONDS * 20L)
         }
     }
 
@@ -77,17 +77,13 @@ class CobwebListener(plugin: JavaPlugin) : ItemModule() {
             val block = event.block
             BlockListener.brokenBlocks[block.location] = BlockBean(block)
             block.type = Material.AIR
-            if (getSettings().getConfig().getBoolean(_ALLOW_DROPS)) {
-                block.world.dropItem(
-                    block.location, ItemStack(Material.COBWEB, 1)
-                )
-            }
+            if (ALLOW_DROPS) block.world.dropItem(block.location, ItemStack(Material.COBWEB, 1))
         }
     }
 
     private fun allowCobweb(player: Player, block: Block): Boolean {
-        return isAllowed(player, _SERVER_WIDE, _IN_GAME)
+        return isAllowed(player, IS_SERVER_WIDE, IS_IN_GAME_ONLY)
                 && block.type == Material.COBWEB
-                && player.inventory.itemInMainHand.type == Material.getMaterial(getSettings().getConfig().getString(_ALLOWED_TOOL)!!.uppercase())
+                && player.inventory.itemInMainHand.type == Material.getMaterial(ALLOWED_TOOL.toString().uppercase())
     }
 }

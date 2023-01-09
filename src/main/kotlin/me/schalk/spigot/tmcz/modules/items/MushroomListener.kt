@@ -38,13 +38,13 @@ import kotlin.ConcurrentModificationException
 class MushroomListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val MUSHROOM          = MODULE + ".mushroom"
-        private const val _ENABLED          = MUSHROOM + ENABLED
-        private const val _IN_GAME_ONLY     = MUSHROOM + IN_GAME
-        private const val _SERVER_WIDE      = MUSHROOM + SERVER_WIDE
-        private const val _ALLOWED_TOOL     = MUSHROOM + TOOL_ID
-        private const val _CAN_RESPAWN      = MUSHROOM + RESPAWN
-        private const val _RESPAWN_SECONDS  = MUSHROOM + R_SECONDS
+        private const val MUSHROOM  = MODULE + ".mushroom"
+        private val IS_ENABLED      = getSettings().getConfig().getBoolean(MUSHROOM + ENABLED)
+        private val IS_IN_GAME_ONLY = getSettings().getConfig().getBoolean(MUSHROOM + IN_GAME_ONLY)
+        private val IS_SERVER_WIDE  = getSettings().getConfig().getBoolean(MUSHROOM + SERVER_WIDE)
+        private val ALLOWED_TOOL    = getSettings().getConfig().getString(MUSHROOM + TOOL_ID)
+        private val CAN_RESPAWN     = getSettings().getConfig().getBoolean(MUSHROOM + RESPAWN)
+        private val RESPAWN_SECONDS = getSettings().getConfig().getInt(MUSHROOM + R_SECONDS)
 
         fun cleanUp() {
             BlockListener.brokenBlocks.forEach{ brokenBlock ->
@@ -52,10 +52,13 @@ class MushroomListener(plugin: JavaPlugin) : ItemModule() {
                     val location = brokenBlock.key
                     val block = brokenBlock.value
                     if ((block.material == Material.BROWN_MUSHROOM || block.material == Material.RED_MUSHROOM)
-                        && Date().time.minus(block.date.time) > getSettings().getConfig().getLong(_RESPAWN_SECONDS).times(1000)
+                        && Date().time.minus(block.date.time) > RESPAWN_SECONDS.times(1000)
                     ) {
-                        location.world!!.getBlockAt(location).type = block.material
-                        BlockListener.brokenBlocks.remove(location)
+                        val world = location.world
+                        if (world != null) {
+                            world.getBlockAt(location).type = block.material
+                            BlockListener.brokenBlocks.remove(location)
+                        }
                     }
                 } catch (ignored: ConcurrentModificationException) {
                     // prevent CMD from server log - try again next loop
@@ -65,12 +68,10 @@ class MushroomListener(plugin: JavaPlugin) : ItemModule() {
     }
 
     init {
-        if (getSettings().getConfig().getBoolean(_ENABLED)) {
+        if (IS_ENABLED) {
             plugin.server.pluginManager.registerEvents(this, plugin)
-            if (getSettings().getConfig().getBoolean(_CAN_RESPAWN)) {
-                plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
-                    { cleanUp() }, 15L, getSettings().getConfig().getLong(_RESPAWN_SECONDS) * 20L
-                )
+            if (CAN_RESPAWN) {
+                plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { cleanUp() }, 15L, RESPAWN_SECONDS * 20L)
             }
         }
     }
@@ -79,18 +80,19 @@ class MushroomListener(plugin: JavaPlugin) : ItemModule() {
     fun harvestMushroom(event: PlayerInteractEvent) {
         if (allowMushroom(event.player, event.clickedBlock)) {
             val block = event.clickedBlock
-            val type = block!!.type
-            block.type = Material.AIR
-            block.world.dropItem(block.location, ItemStack(type, 1))
-            BlockListener.brokenBlocks[block.location] = BlockBean(block)
+            if (block != null) {
+                val type = block.type
+                block.type = Material.AIR
+                block.world.dropItem(block.location, ItemStack(type, 1))
+                BlockListener.brokenBlocks[block.location] = BlockBean(block)
+            }
         }
     }
 
     private fun allowMushroom(player: Player, clickedBlock: Block?): Boolean {
-        return isAllowed(player, _SERVER_WIDE, _IN_GAME_ONLY) && clickedBlock != null &&
+        return isAllowed(player, IS_SERVER_WIDE, IS_IN_GAME_ONLY) && clickedBlock != null &&
                 (clickedBlock.type == Material.RED_MUSHROOM || clickedBlock.type == Material.BROWN_MUSHROOM) &&
-                player.inventory.itemInMainHand.type == getSettings().getConfig().getString(
-            _ALLOWED_TOOL)?.let { Material.getMaterial(it.uppercase()) }
+                player.inventory.itemInMainHand.type == Material.getMaterial(ALLOWED_TOOL.toString().uppercase())
     }
 
     // TODO: Allow bone meal on Mushrooms, but instead of growing into big, multiply into many smaller ones nearby

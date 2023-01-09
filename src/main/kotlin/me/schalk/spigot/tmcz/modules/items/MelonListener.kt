@@ -34,15 +34,15 @@ import org.bukkit.plugin.java.JavaPlugin
 class MelonListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val MELON         = MODULE + ".melon"
-        private const val _ENABLED      = MELON + ENABLED
-        private const val _IN_GAME_ONLY = MELON + IN_GAME
-        private const val _SERVER_WIDE  = MELON + SERVER_WIDE
-        private const val _ALLOWED_TOOL = MELON + TOOL_ID
+        private const val MELON     = MODULE + ".melon"
+        private val IS_ENABLED      = getSettings().getConfig().getBoolean(MELON + ENABLED)
+        private val IS_IN_GAME_ONLY = getSettings().getConfig().getBoolean(MELON + IN_GAME_ONLY)
+        private val IS_SERVER_WIDE  = getSettings().getConfig().getBoolean(MELON + SERVER_WIDE)
+        private val ALLOWED_TOOL    = getSettings().getConfig().getString(MELON + TOOL_ID)
     }
 
     init {
-        if (getSettings().getConfig().getBoolean(_ENABLED)) {
+        if (IS_ENABLED) {
             plugin.server.pluginManager.registerEvents(this, plugin)
         }
     }
@@ -57,8 +57,8 @@ class MelonListener(plugin: JavaPlugin) : ItemModule() {
     }
 
     private fun allowMelon(player: Player, block: Block): Boolean {
-        return isAllowed(player, _SERVER_WIDE, _IN_GAME_ONLY)
+        return isAllowed(player, IS_SERVER_WIDE, IS_IN_GAME_ONLY)
                 && block.type == Material.MELON
-                && player.inventory.itemInMainHand.type == Material.getMaterial(getSettings().getConfig().getString(_ALLOWED_TOOL)!!.uppercase())
+                && player.inventory.itemInMainHand.type == Material.getMaterial(ALLOWED_TOOL.toString().uppercase())
     }
 }

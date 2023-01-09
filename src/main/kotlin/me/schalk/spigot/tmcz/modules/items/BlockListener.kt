@@ -39,13 +39,13 @@ import java.util.*
 class BlockListener(plugin: JavaPlugin) : ItemModule() {
 
     companion object {
-        private const val BLOCK_PROTECTION      = MODULE +".block-protection"
-        private const val _CAN_PLACE_BLOCKS     = BLOCK_PROTECTION + ".place"
-        private const val _CAN_BREAK_BLOCKS     = BLOCK_PROTECTION + ".break"
-        private const val _IN_GAME_ONLY         = BLOCK_PROTECTION + IN_GAME
-        private const val _SERVER_WIDE          = BLOCK_PROTECTION + SERVER_WIDE
-        private const val _CAN_OP_BUILD         = BLOCK_PROTECTION + ".op-can-build"
-        private const val _ALLOWED_ITEMS_CONFIG = BLOCK_PROTECTION + ".allowed-items"
+        private const val BLOCK_PROTECTION = MODULE +".block-protection"
+        val CAN_PLACE_BLOCKS            = getSettings().getConfig().getBoolean(BLOCK_PROTECTION + ".place")
+        val CAN_BREAK_BLOCKS            = getSettings().getConfig().getBoolean(BLOCK_PROTECTION + ".break")
+        val IS_IN_GAME_ONLY             = getSettings().getConfig().getBoolean(BLOCK_PROTECTION + IN_GAME_ONLY)
+        val IS_SERVER_WIDE              = getSettings().getConfig().getBoolean(BLOCK_PROTECTION + SERVER_WIDE)
+        val CAN_OP_BUILD                = getSettings().getConfig().getBoolean(BLOCK_PROTECTION + ".op-can-build")
+        val ALLOWED_ITEMS: List<String> = getSettings().getConfig().getStringList(BLOCK_PROTECTION + ".allowed-items")
 
         private val allowedItems = mutableMapOf<Material, BlockBean>()
         private val placedBlocks = mutableMapOf<Location, BlockBean>()
@@ -63,10 +63,14 @@ class BlockListener(plugin: JavaPlugin) : ItemModule() {
                     val location = placedBlock.key
                     val block = placedBlock.value
                     val data = allowedItems[block.material]
-                    val place: Long = block.date.time
-                    if (force || now - place > (data?.despawnSeconds?.times(1000)!!)) {
-                        location.world!!.getBlockAt(location).type = Material.AIR
-                        placedBlocks.remove(location)
+                    if (data != null) {
+                        val place: Long = block.date.time
+                        if (force || now - place > (data.despawnSeconds.times(1000))) {
+                            val world = location.world
+                            if (world != null)
+                                world.getBlockAt(location).type = Material.AIR
+                            placedBlocks.remove(location)
+                        }
                     }
                 } catch (ignored: ConcurrentModificationException) {
                     // prevent CME from the log - try again next loop
@@ -81,12 +85,17 @@ class BlockListener(plugin: JavaPlugin) : ItemModule() {
                     val location = brokenBlock.key
                     val block = brokenBlock.value
                     val data = allowedItems[block.material]
-                    val broken: Long = block.date.time
-                    if (force || now - broken > (data?.respawnSeconds?.times(1000)!!)) {
-                        val toRepair = location.world!!.getBlockAt(location)
-                        toRepair.type = block.material
-                        toRepair.blockData = block.data
-                        placedBlocks.remove(location)
+                    if (data != null) {
+                        val broken: Long = block.date.time
+                        if (force || now - broken > (data.respawnSeconds.times(1000))) {
+                            val world = location.world
+                            if (world != null) {
+                                val toRepair = world.getBlockAt(location)
+                                toRepair.type = block.material
+                                toRepair.blockData = block.data
+                                placedBlocks.remove(location)
+                            }
+                        }
                     }
                 }
             } catch (ignored: ConcurrentModificationException) {
@@ -98,17 +107,11 @@ class BlockListener(plugin: JavaPlugin) : ItemModule() {
     init {
         registerAllowedItems(plugin)
         plugin.server.pluginManager.registerEvents(this, plugin)
-        if (getSettings().getConfig().getBoolean(_CAN_PLACE_BLOCKS)) {
-            plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
-                { cleanUpPlacedBlocks(false) }, 15L, 600L
-            )
-        }
-        if (getSettings().getConfig().getBoolean(_CAN_BREAK_BLOCKS)) {
-            plugin.server.pluginManager.registerEvents(this, plugin)
-            plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
-                { cleanUpBrokenBlocks(false) }, 15L, 600L
-            )
-        }
+        if (CAN_PLACE_BLOCKS)
+            plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { cleanUpPlacedBlocks(false) }, 15L, 600L)
+
+        if (CAN_BREAK_BLOCKS)
+            plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { cleanUpBrokenBlocks(false) }, 15L, 600L)
     }
 
     @EventHandler
@@ -134,14 +137,15 @@ class BlockListener(plugin: JavaPlugin) : ItemModule() {
     }
 
     // Return value is whether the action is blocked (false = not blocked, true = is blocked)
-    private fun trackBlockInteraction(player: Player, block: Block, tracker: MutableMap<Location, BlockBean>, place: Boolean): Boolean {
+    private fun trackBlockInteraction(player: Player,
+                                      block: Block,
+                                      tracker: MutableMap<Location, BlockBean>,
+                                      place: Boolean): Boolean {
         if (isBlockProtectionEnabled(player)) {
-            if (player.isPermissionSet(Permissions.BUILDER) || (getSettings().getConfig().getBoolean(_CAN_OP_BUILD) && player.isOp)) {
-                // Player has tmcz.builder permission or is OP and OP can build
+            if (player.isPermissionSet(Permissions.BUILDER) || (CAN_OP_BUILD && player.isOp)) {
                 return false
 
-            } else if (getSettings().getConfig().getBoolean(_IN_GAME_ONLY) && !GameData.getPlayer(player).playing) {
-                // player is not playing, block the event
+            } else if (IS_IN_GAME_ONLY && !GameData.getPlayer(player).playing) {
                 return true
 
             } else {
@@ -179,11 +183,11 @@ class BlockListener(plugin: JavaPlugin) : ItemModule() {
 
     private fun breakPlacedBlock(event: BlockBreakEvent) {
         if (!event.player.hasPermission(Permissions.BUILDER)
-            && (!getSettings().getConfig().getBoolean(_CAN_OP_BUILD) || !event.player.isOp)
+            && (!CAN_OP_BUILD || !event.player.isOp)
             && isBlockProtectionEnabled(event.player)
         ) {
             if (placedBlocks.containsKey(event.block.location)) {
-                if (getSettings().getConfig().getBoolean(_IN_GAME_ONLY) && !GameData.getPlayer(event.player).playing) {
+                if (IS_IN_GAME_ONLY && !GameData.getPlayer(event.player).playing) {
                     event.isCancelled = true
                 } else {
                     placedBlocks.remove(event.block.location)
@@ -195,18 +199,19 @@ class BlockListener(plugin: JavaPlugin) : ItemModule() {
     }
 
     private fun isBlockProtectionEnabled(player: Player): Boolean {
-        return isAllowed(player, _SERVER_WIDE, _IN_GAME_ONLY)
+        return isAllowed(player, IS_SERVER_WIDE, IS_IN_GAME_ONLY)
     }
 
     private fun registerAllowedItems(plugin: JavaPlugin) {
-        val config: List<String> = getSettings().getConfig().getStringList(_ALLOWED_ITEMS_CONFIG)
-        for (itemString in config) {
+        for (itemString in ALLOWED_ITEMS) {
             try {
                 val item = itemString.split("\\|".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
                 val blockName = Material.getMaterial(item[0].uppercase())
                 val despawnSeconds = item[1].toInt()
                 val respawnSeconds = item[2].toInt()
-                allowedItems[blockName!!] = BlockBean(blockName, despawnSeconds, respawnSeconds)
+                if (blockName != null) {
+                    allowedItems[blockName] = BlockBean(blockName, despawnSeconds, respawnSeconds)
+                }
             } catch (e: Exception) {
                 plugin.logger.info("Error parsing allowed items: incorrect format - [$itemString]")
             }

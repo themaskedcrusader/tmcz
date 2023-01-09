@@ -42,32 +42,31 @@ import org.bukkit.potion.PotionEffectType
 class SugarListener(plugin: JavaPlugin) : ItemModule() {
 
     init{
-        if (getSettings().getConfig().getBoolean(_ENABLED)) {
+        if (IS_ENABLED) {
             SugarListener.plugin = plugin
-            val duration = getSettings().getConfig().getInt(_DURATION)
+            val duration = DURATION
             plugin.server.pluginManager.registerEvents(this, plugin)
-            plugin.server.scheduler.scheduleSyncRepeatingTask(
-                plugin, { processSugarCoolDown() }, 200, (duration * 100).toLong() )
-            plugin.server.scheduler.scheduleSyncRepeatingTask(plugin,
-                { processSugarRandomEffect() }, 200, (duration * 100).toLong() )
+            plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { processSugarCoolDown() }, 200, (duration * 100) )
+            plugin.server.scheduler.scheduleSyncRepeatingTask(plugin, { processSugarRandomEffect() }, 200, (duration * 100) )
             plugin.server.logger.info("Sugar system online...")
         }
     }
 
     companion object {
-        private const val SUGAR                 = MODULE + ".sugar"
-        private const val _ENABLED              = SUGAR + ENABLED
-        private const val _ONLY_IN_GAME         = SUGAR + IN_GAME
-        private const val _SERVER_WIDE          = SUGAR + SERVER_WIDE
-        private const val _DURATION             = SUGAR + ".duration"
-        private const val _OVERDOSE             = SUGAR + ".overdose"
-        private const val _TOLERANCE            = SUGAR + ".tolerance"
-        private const val _TOLERANCE_OVERDOSE   = SUGAR + ".tolerance-overdose"
-        private const val _DEATH_CHANCE         = SUGAR + ".death-chance"
-        private const val _SIDE_EFFECT_CHANCE   = SUGAR + ".side-effect"
-        private const val _LATENT_EFFECT_CHANCE = SUGAR + ".random-effect"
-        private const val _DEATH_MESSAGE        = SUGAR + ".death"
-        private const val _DEATH_SIDE_EFFECT    = SUGAR + ".side-effect"
+        private const val SUGAR             = MODULE + ".sugar"
+        private val IS_ENABLED              = getSettings().getConfig().getBoolean(SUGAR + ENABLED)
+        private val IS_ONLY_IN_GAME         = getSettings().getConfig().getBoolean(SUGAR + IN_GAME_ONLY)
+        private val IS_SERVER_WIDE          = getSettings().getConfig().getBoolean(SUGAR + SERVER_WIDE)
+        private val DURATION                = getSettings().getConfig().getLong(SUGAR + ".duration")
+        private val OVERDOSE                = getSettings().getConfig().getInt(SUGAR + ".overdose")
+        private val TOLERANCE               = getSettings().getConfig().getInt(SUGAR + ".tolerance")
+        private val TOLERANCE_OVERDOSE      = getSettings().getConfig().getInt(SUGAR + ".tolerance-overdose")
+        private val DEATH_CHANCE            = getSettings().getConfig().getInt(SUGAR + ".death-chance")
+        private val SIDE_EFFECT_CHANCE      = getSettings().getConfig().getInt(SUGAR + ".side-effect")
+        private val LATENT_EFFECT_CHANCE    = getSettings().getConfig().getInt(SUGAR + ".random-effect")
+
+        private val DEATH_MESSAGE           = getMessages().getConfig().getString(SUGAR + ".death")
+        private val DEATH_SIDE_EFFECT       = getMessages().getConfig().getString(SUGAR + ".side-effect")
         private lateinit var plugin: JavaPlugin
 
         private val possibleSideEffects = listOf(
@@ -85,7 +84,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
 
         fun processSugarCoolDown() {
             plugin.server.onlinePlayers.forEach { player ->
-                if (isAllowed(player, _SERVER_WIDE, _ONLY_IN_GAME)) {
+                if (isAllowed(player, IS_SERVER_WIDE, IS_ONLY_IN_GAME)) {
                     val playerBean = GameData.getPlayer(player)
                     if (playerBean.drugged_cooldown > 0) {
                         playerBean.drugged_cooldown--
@@ -96,11 +95,9 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
 
         fun processSugarRandomEffect() {
             plugin.server.onlinePlayers.forEach { player ->
-                if (isAllowed(player, _SERVER_WIDE, _ONLY_IN_GAME)) {
+                if (isAllowed(player, IS_SERVER_WIDE, IS_ONLY_IN_GAME)) {
                     val playerBean = GameData.getPlayer(player)
-                    val latentSideEffectChance = nextRandomIntBetween(0, getSettings().getConfig().getInt(
-                        _LATENT_EFFECT_CHANCE))
-                    if (playerBean.drugged_doses > 0 && 1 == latentSideEffectChance) {
+                    if (playerBean.drugged_doses > 0 && 1 == nextRandomIntBetween(0, LATENT_EFFECT_CHANCE)) {
                         addSideEffect(player)
                     }
                 }
@@ -110,8 +107,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
         private fun getSideEffect() : PotionEffect {
             val index = nextRandomIntBetween(0, possibleSideEffects.size)
             val sideEffect = possibleSideEffects[index - 1]
-            val duration = getSettings().getConfig().getInt(_DURATION)
-            return PotionEffect(sideEffect, duration * 20, 1, false, false, false)
+            return PotionEffect(sideEffect, DURATION.toInt() * 20, 1, false, false, false)
         }
 
         private fun addSideEffect(player: Player) {
@@ -119,10 +115,9 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
             player.addPotionEffect(sideEffect)
             player.sendMessage(ChatColor.RED.toString() +
                     "Oof, I don't feel so good... is this a side effect of the sugar?")
-            val duration = getSettings().getConfig().getInt(_DURATION)
             GameData.getPlayer(player).side_effect = true
             plugin.server.scheduler.scheduleSyncDelayedTask(plugin,
-                { GameData.getPlayer(player).side_effect = false}, (duration * 20).toLong())
+                { GameData.getPlayer(player).side_effect = false }, (DURATION * 20))
         }
     }
 
@@ -130,7 +125,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
     fun takeThatHit(event: PlayerInteractEvent) {
         val player = event.player
         val playerBean = GameData.getPlayer(player)
-        if (isAllowed(player, _SERVER_WIDE, _ONLY_IN_GAME)) {
+        if (isAllowed(player, IS_SERVER_WIDE, IS_ONLY_IN_GAME)) {
             val itemInHand = player.inventory.itemInMainHand
             if (itemInHand.type == Material.SUGAR &&
                 (event.action == Action.RIGHT_CLICK_AIR || event.action == Action.RIGHT_CLICK_BLOCK)
@@ -151,7 +146,7 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
     private fun applyPotionEffect(player: Player, playerBean: GameData.PlayerBean) {
         val potionEffect = PotionEffectType.SPEED
         val currentEffect = player.getPotionEffect(potionEffect)
-        val sugarDuration = getSettings().getConfig().getInt(_DURATION) * 20
+        val sugarDuration = DURATION.toInt() * 20
         if (currentEffect != null) {
             val newEffect = PotionEffect(potionEffect, currentEffect.duration + sugarDuration, 1, false, false, false)
             player.removePotionEffect(potionEffect)
@@ -172,31 +167,26 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
     }
 
     private fun calculateTolerance(playerBean: GameData.PlayerBean) {
-        if (!playerBean.tolerance && playerBean.drugged_doses > getSettings().getConfig().getInt(_TOLERANCE)) {
+        if (!playerBean.tolerance && playerBean.drugged_doses > TOLERANCE) {
             playerBean.tolerance = true
         }
     }
 
     private fun calculateChanceOfSideEffect(player: Player, playerBean: GameData.PlayerBean) {
-        val chanceOfSideEffect = nextRandomIntBetween(0, getSettings().getConfig().getInt(_SIDE_EFFECT_CHANCE))
-        if (playerBean.drugged_doses > 0 && 1 == chanceOfSideEffect) {
+        if (playerBean.drugged_doses > 0 && 1 == nextRandomIntBetween(0, SIDE_EFFECT_CHANCE)) {
             addSideEffect(player)
         }
     }
 
     private fun calculateChanceOfDeath(player: Player, playerBean: GameData.PlayerBean) {
-        val chanceOfInstantDeath = nextRandomIntBetween(0, getSettings().getConfig().getInt(_DEATH_CHANCE))
-        if (playerBean.drugged_doses > 0 && 1 == chanceOfInstantDeath) {
+        if (playerBean.drugged_doses > 0 && 1 == nextRandomIntBetween(0, DEATH_CHANCE)) {
             player.damage(100.0)
             playerBean.overdose = true
         }
     }
 
     private fun checkForOverDose(player: Player, playerBean: GameData.PlayerBean) {
-        var overdose = getSettings().getConfig().getInt(_OVERDOSE)
-        if (playerBean.tolerance) {
-            overdose = getSettings().getConfig().getInt(_TOLERANCE_OVERDOSE)
-        }
+        val overdose = if (playerBean.tolerance) TOLERANCE_OVERDOSE else OVERDOSE
         if (playerBean.drugged_cooldown > overdose) {
             player.damage(100.0)
             playerBean.overdose = true
@@ -205,15 +195,13 @@ class SugarListener(plugin: JavaPlugin) : ItemModule() {
 
     @EventHandler
     fun sugarDeath(event: PlayerDeathEvent) {
-        if (isAllowed(event.entity, _SERVER_WIDE, _ONLY_IN_GAME)) {
+        if (isAllowed(event.entity, IS_SERVER_WIDE, IS_ONLY_IN_GAME)) {
             println(event.entity.lastDamageCause?.cause)
             if (GameData.getPlayer(event.entity).overdose
                 && event.entity.lastDamageCause?.cause == EntityDamageEvent.DamageCause.CUSTOM) {
-                event.deathMessage = getMessages().getConfig().getString(_DEATH_MESSAGE)
-                    ?.replace("__player", event.entity.displayName)
+                event.deathMessage = DEATH_MESSAGE?.replace("__player", event.entity.displayName)
             } else if (GameData.getPlayer(event.entity).side_effect) {
-                event.deathMessage = getMessages().getConfig().getString(_DEATH_SIDE_EFFECT)
-                    ?.replace("__player", event.entity.displayName)
+                event.deathMessage = DEATH_SIDE_EFFECT?.replace("__player", event.entity.displayName)
             }
             val playerBean = GameData.getPlayer(event.entity)
             playerBean.overdose = false

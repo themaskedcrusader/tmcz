@@ -34,12 +34,11 @@ abstract class ItemModule : Listener {
     companion object {
         const val MODULE        = "item-system"
         const val ENABLED       = ".enabled"
-        const val IN_GAME       = ".only-in-game"
+        const val IN_GAME_ONLY  = ".only-in-game"
         const val SERVER_WIDE   = ".server-wide"
         const val RESPAWN       = ".respawn"
         const val R_SECONDS     = ".respawn-seconds"
         const val TOOL_ID       = ".tool"
-
 
         fun initialize(plugin: JavaPlugin) {
             if (getSettings().getConfig().getBoolean(MODULE + ENABLED)) {
@@ -54,11 +53,10 @@ abstract class ItemModule : Listener {
             }
         }
 
-        fun isAllowed(player: Player, serverWide: String, inGame: String): Boolean {
+        fun isAllowed(player: Player, serverWide: Boolean, inGameOnly: Boolean): Boolean {
             val worldAllowed: Boolean = isWorldAllowed(player.world, getSettings())
-            if (getSettings().getConfig().getBoolean(serverWide)) return true
-            return if (getSettings().getConfig().getBoolean(inGame))
-                GameData.getPlayer(player).playing && worldAllowed else worldAllowed
+            if (serverWide) return true
+            return if (inGameOnly) GameData.getPlayer(player).playing && worldAllowed else worldAllowed
         }
     }
 }
