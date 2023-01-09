@@ -40,12 +40,12 @@ class ZombieListener(val plugin: JavaPlugin) : MobModule() {
 
     companion object {
         private val zombieHead = MaskedItem("ZOMBIE_HEAD|1|0")
-        private val ZOMBIE = ".zombie"
-        private val ENABLED = getSettings().getConfig().getBoolean(MODULE + ZOMBIE + ".enabled")
-        private val CAN_BURN = getSettings().getConfig().getBoolean(MODULE + ZOMBIE + ".can-burn")
-        private val HEAD_HIDES_PLAYER = getSettings().getConfig().getBoolean(MODULE + ZOMBIE + ".head-hides")
-        private val HEAD_DROP_CHANCE = getSettings().getConfig().getInt(MODULE + ZOMBIE + ".head-drop-chance")
-        private val HEAD_BREAK_CHANCE = getSettings().getConfig().getInt(MODULE + ZOMBIE + ".head-break-chance")
+        private val ZOMBIE = MODULE + ".zombie"
+        private val ENABLED             = getSettings().getConfig().getBoolean(ZOMBIE + ".enabled")
+        private val CAN_BURN            = getSettings().getConfig().getBoolean(ZOMBIE + ".can-burn")
+        private val HEAD_HIDES_PLAYER   = getSettings().getConfig().getBoolean(ZOMBIE + ".head-hides")
+        private val HEAD_DROP_CHANCE    = getSettings().getConfig().getInt(ZOMBIE + ".head-drop-chance")
+        private val HEAD_BREAK_CHANCE   = getSettings().getConfig().getInt(ZOMBIE + ".head-break-chance")
     }
 
     init{
